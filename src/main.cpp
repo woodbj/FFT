@@ -2,7 +2,6 @@
 
 void Sample(void *)
 {
-  // buff.fillBuffer();
 
   unsigned int newTime;
   unsigned int endTime;
@@ -30,17 +29,13 @@ void Compute(void *)
   delay(250);
   for (;;)
   {
-
     tStart = micros();
     computeSamples();
     processSamples();
     menu();
     displaySamples();
-
     delay(1); // keep the watchdog happy
-
-    displayPeriod = SAMPLES * (1e6 / uv[SAMPLERATE].val) * (1 - uv[OVERLAP].val / 100.0f);
-
+    displayPeriod = SAMPLES * (1e6 / uvSAMPLERATE) * (1 - uvOVERLAP / 100.0f);
     while (micros() - tStart < displayPeriod){} // chill
   }
 }
@@ -96,12 +91,6 @@ void setup()
   uv[FHIGH].fastEnable = true;
   uv[FHIGH].fastDelta = 5;
   uv[FHIGH].reverseValueBar = true;
-
-  strcpy(uv[PEAKS].title, "PEAK");
-  uv[PEAKS].ptr = &uvPEAKS;
-  uv[PEAKS].min = 0;
-  uv[PEAKS].max = 1;
-  uv[PEAKS].delta = 0.25;
 
   strcpy(uv[YSCALE].title, "YSCL");
   uv[YSCALE].ptr = &uvYSCALE;
@@ -193,6 +182,7 @@ void setup()
 
   xTaskCreatePinnedToCore(Sample, "Sample Task", STACK_SIZE, nullptr, 1, &sampler, 0);
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);
+
 }
 
 void loop()

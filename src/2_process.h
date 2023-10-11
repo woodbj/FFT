@@ -1,12 +1,5 @@
 
 
-void getPeaks(){
-  for (int i = 2; i < SAMPLES / 2 - 1; i++){
-    if(vRe[i] > vRe[i - 1] && vRe[i] > vRe[i + 1]);
-    else vRe[i] *= peakWeights;
-  }
-}
-
 void yAxis() {
   float res = uvSAMPLERATE / (1.0f * SAMPLES);
   float binf;
@@ -49,10 +42,8 @@ void scale() {
 
   if (counter > hiThreshold) {
     vol -= volDelta;
-    Serial.println(vol);
   } else if (counter < loThreshold) {
     vol += volDelta;
-    Serial.println(vol);
   }
   vol = constrain(vol, 0.5, uvVOLUME);
 }
@@ -148,10 +139,7 @@ void buildBins() {  // can count beyond samples/2 so needs some fixing
   }
 }
 
-
-
 void processSamples() {
-  getPeaks();
   yAxis();
   binsToBands();
   scale();

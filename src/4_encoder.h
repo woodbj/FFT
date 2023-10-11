@@ -57,8 +57,10 @@ void editUserVariable(int dir, UserVar_t* var) {
     else var->val = var->min;
   }
 
+  *var->ptr = var->val;
+  Serial.printf("ptr: %f\tval: %f\n", *var->ptr, var->val);
+
   var->changed = true;
-  Serial.println(var->val);
 
   // tell the display what it needs to know to show the value bar
   currentValue = var->val;

@@ -35,8 +35,8 @@ int title[NUM_LED];
 // FFT
 #include <arduinoFFT.h>
 #define SAMPLES 1024
-#define SAMPLE_FREQ 20000.0f  //25140.0f
-float sampleRate = SAMPLE_FREQ;
+#define SAMPLE_FREQ 35000.0f  //25140.0f
+float uvSAMPLERATE = SAMPLE_FREQ;
 int firstBin;                 // value set by void buildBins()
 int binsPerBand[MAT_W] = { 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5, 5, 7, 7, 9, 11 };
 double vRe[SAMPLES];
@@ -67,7 +67,6 @@ float bandValues[MAT_W];
 const int avgSamples = 100;
 int avgCounter = 0;
 float integral[avgSamples];
-float peakWeights = 1;
 
 // Encoder
 #define CLK 13  // blue wire
@@ -90,7 +89,6 @@ CRGB menuColour = CRGB::White;
 enum Menu {
   STYLE,
   STYLE_SETTING,
-  PEAKS,
   FLOW,
   FHIGH,
   SAMPLERATE,
@@ -118,10 +116,9 @@ enum Styles {
 };
 
 float uvSTYLE = SPECTROGRAM;
-float uvPEAKS = 1;
 float uvFLOW = 32;
 float uvFHIGH = 80;
-float uvSAMPLERATE = 35000;
+
 float uvYSCALE = INT_POWER_DENSITY;
 float uvWINDOW = HANNING;
 float uvOVERLAP = 50;
