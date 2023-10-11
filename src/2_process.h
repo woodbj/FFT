@@ -35,6 +35,8 @@ void scale() {
   int counter = 0;
   static float vol = 1;
   float volDelta = 0.01;
+  int loThreshold = 4;
+  int hiThreshold = 8;
 
   for (int band = 0; band < MAT_W; band++) {
     val = bandValues[band];
@@ -45,10 +47,10 @@ void scale() {
     if (val == 1) counter++;
   }
 
-  if (counter > 8) {
+  if (counter > hiThreshold) {
     vol -= volDelta;
     Serial.println(vol);
-  } else if (counter < 4) {
+  } else if (counter < loThreshold) {
     vol += volDelta;
     Serial.println(vol);
   }
