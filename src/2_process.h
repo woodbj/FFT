@@ -33,21 +33,26 @@ void scale() {
   // Scale the bandValues
   float val;
   int counter = 0;
+  static float vol = 1;
+  float volDelta = 0.01;
+
   for (int band = 0; band < MAT_W; band++) {
     val = bandValues[band];
     val = powf(val, uv[GAIN].val);  // add non-linearity to the response
-    val *= uv[VOLUME].val;          // scale
+    val *= vol;          // scale
     if (val > 1.0) val = 1.0;       // set peak value at 1
     bandValues[band] = val;
     if (val == 1) counter++;
   }
 
-  if (counter > 10) {
-    uv[VOLUME].val -= uv[VOLUME].delta;
-  } else if (counter < 2) {
-    uv[VOLUME].val += uv[VOLUME].delta;
+  if (counter > 8) {
+    vol -= volDelta;
+    Serial.println(vol);
+  } else if (counter < 4) {
+    vol += volDelta;
+    Serial.println(vol);
   }
-  uv[VOLUME].val = constrain(uv[VOLUME].val, uv[VOLUME].min, uv[VOLUME].max);
+  vol = constrain(vol, 0.5, uv[VOLUME].val);
 }
 
 void binsToBands() {

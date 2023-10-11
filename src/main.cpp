@@ -2,6 +2,8 @@
 
 void Sample(void *)
 {
+  // buff.fillBuffer();
+
   unsigned int newTime;
   unsigned int endTime;
 
@@ -39,28 +41,18 @@ void Compute(void *)
 
     displayPeriod = SAMPLES * (1e6 / uv[SAMPLERATE].val) * (1 - uv[OVERLAP].val / 100.0f);
 
-    while (micros() - tStart < displayPeriod){
-      Serial.println("Waiting");
-    } // chill
-
-    // displayHz = 1.0e6 / (micros() - tStart);
-    // Serial.println(displayHz);
-
-    // for some reason the frame rate is increasing as sample rate decreases
+    while (micros() - tStart < displayPeriod){} // chill
   }
 }
 
 void setup()
 {
-
   // fill user variables
   strcpy(uv[VOLUME].title, "LOUD");
-  uv[VOLUME].val = 2;
-  uv[VOLUME].min = 0.5;
+  uv[VOLUME].val = 10;
+  uv[VOLUME].min = 0.6;
   uv[VOLUME].max = 10;
-  uv[VOLUME].delta = 0.01;
-  uv[VOLUME].fastEnable = true;
-  uv[VOLUME].fastDelta = 0.5;
+  uv[VOLUME].delta = 1;
 
   strcpy(uv[GAIN].title, "GAIN");
   uv[GAIN].val = 1;
@@ -199,7 +191,6 @@ void setup()
 
   applyChanges();
 
-  // assign tasks to cores
   xTaskCreatePinnedToCore(Sample, "Sample Task", STACK_SIZE, nullptr, 1, &sampler, 0);
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);
 }
