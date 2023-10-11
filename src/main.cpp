@@ -49,25 +49,25 @@ void setup()
 {
   // fill user variables
   strcpy(uv[VOLUME].title, "LOUD");
-  uv[VOLUME].val = 10;
+  uv[VOLUME].ptr = &uvVOLUME;
   uv[VOLUME].min = 0.6;
   uv[VOLUME].max = 10;
   uv[VOLUME].delta = 1;
 
   strcpy(uv[GAIN].title, "GAIN");
-  uv[GAIN].val = 1;
+  uv[GAIN].ptr = &uvGAIN;
   uv[GAIN].delta = 0.1;
   uv[GAIN].min = 0.5;
   uv[GAIN].max = 1.5;
 
   strcpy(uv[WINDOW].title, "WIN");
-  uv[WINDOW].val = HANNING;
+  uv[WINDOW].ptr = &uvWINDOW;
   uv[WINDOW].min = 0;
   uv[WINDOW].max = WINDOW_COUNT - 1;
   uv[WINDOW].delta = 1;
 
   strcpy(uv[OVERLAP].title, "OVLP");
-  uv[OVERLAP].val = 50;
+  uv[OVERLAP].ptr = &uvOVERLAP;
   uv[OVERLAP].min = 0;
   uv[OVERLAP].max = 50;
   uv[OVERLAP].delta = 1;
@@ -75,7 +75,7 @@ void setup()
   uv[OVERLAP].fastDelta = 5;
 
   strcpy(uv[SAMPLERATE].title, "SRAT");
-  uv[SAMPLERATE].val = 35000;
+  uv[SAMPLERATE].ptr = &uvSAMPLERATE;
   uv[SAMPLERATE].min = 15000;
   uv[SAMPLERATE].max = 35000;
   uv[SAMPLERATE].delta = 50;
@@ -83,13 +83,13 @@ void setup()
   uv[SAMPLERATE].fastDelta = 1000;
 
   strcpy(uv[FLOW].title, "LO");
-  uv[FLOW].val = 32;
+  uv[FLOW].ptr = &uvFLOW;
   uv[FLOW].min = 32;
   uv[FLOW].max = 48;
   uv[FLOW].delta = 1;
 
   strcpy(uv[FHIGH].title, "HI");
-  uv[FHIGH].val = 80;
+  uv[FHIGH].ptr = &uvFHIGH;
   uv[FHIGH].min = 60;
   uv[FHIGH].max = 117;
   uv[FHIGH].delta = 1;
@@ -98,33 +98,33 @@ void setup()
   uv[FHIGH].reverseValueBar = true;
 
   strcpy(uv[PEAKS].title, "PEAK");
-  uv[PEAKS].val = 1;
+  uv[PEAKS].ptr = &uvPEAKS;
   uv[PEAKS].min = 0;
   uv[PEAKS].max = 1;
   uv[PEAKS].delta = 0.25;
 
   strcpy(uv[YSCALE].title, "YSCL");
-  uv[YSCALE].val = INT_POWER_DENSITY;
+  uv[YSCALE].ptr = &uvYSCALE;
   uv[YSCALE].min = 0;
   uv[YSCALE].max = LAST_YSCALE - 1;
   uv[YSCALE].delta = 1;
 
   strcpy(uv[STYLE].title, "STYL");
-  uv[STYLE].val = SPECTROGRAM;
+  uv[STYLE].ptr = &uvSTYLE;
   uv[STYLE].min = SPECTROGRAM;
   uv[STYLE].max = LAST_STYLE - 1;
   uv[STYLE].delta = 1;
   uv[STYLE].rollover = false;
 
   strcpy(styleSettings[SPECTROGRAM].title, "PALT");
-  styleSettings[SPECTROGRAM].val = 0;
+  styleSettings[SPECTROGRAM].ptr = &uvSTYLE_SETTING_SPECTROGRAM;
   styleSettings[SPECTROGRAM].min = 0;
   styleSettings[SPECTROGRAM].max = PAL_COUNT - 1;
   styleSettings[SPECTROGRAM].delta = 1;
   styleSettings[SPECTROGRAM].showValueBar = true;
 
   strcpy(styleSettings[COLOUR_BC].title, "COLR");
-  styleSettings[COLOUR_BC].val = 0;
+  styleSettings[COLOUR_BC].ptr = &uvSTYLE_SETTING_COLOUR_BC;
   styleSettings[COLOUR_BC].min = 0;
   styleSettings[COLOUR_BC].max = 360;
   styleSettings[COLOUR_BC].delta = 1;
@@ -135,7 +135,7 @@ void setup()
   styleSettings[COLOUR_BCW] = styleSettings[COLOUR_BC];
 
   strcpy(styleSettings[RAINBOW_BC].title, "RATE");
-  styleSettings[RAINBOW_BC].val = 0;
+  styleSettings[RAINBOW_BC].ptr = &uvSTYLE_SETTING_RAINBOW_BC;
   styleSettings[RAINBOW_BC].min = 0;
   styleSettings[RAINBOW_BC].max = 50;
   styleSettings[RAINBOW_BC].delta = 1;

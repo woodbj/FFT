@@ -34,7 +34,7 @@ void getMagnitude() {
 
 void computeSamples() {
   pushBuffer();
-  applyWindow(uv[WINDOW].val);
+  applyWindow(uvWINDOW);
   FFT.Compute(FFT_FORWARD);
   getMagnitude();
 }

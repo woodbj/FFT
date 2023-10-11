@@ -8,9 +8,9 @@ void getPeaks(){
 }
 
 void yAxis() {
-  float res = uv[SAMPLERATE].val / (1.0f * SAMPLES);
+  float res = uvSAMPLERATE / (1.0f * SAMPLES);
   float binf;
-  int scaleCase = (int)uv[YSCALE].val;
+  int scaleCase = (int)uvYSCALE;
 
   for (int i = 1; i <= SAMPLES / 2; i++) {
     switch (scaleCase) {
@@ -40,7 +40,7 @@ void scale() {
 
   for (int band = 0; band < MAT_W; band++) {
     val = bandValues[band];
-    val = powf(val, uv[GAIN].val);  // add non-linearity to the response
+    val = powf(val, uvGAIN);  // add non-linearity to the response
     val *= vol;          // scale
     if (val > 1.0) val = 1.0;       // set peak value at 1
     bandValues[band] = val;
@@ -54,7 +54,7 @@ void scale() {
     vol += volDelta;
     Serial.println(vol);
   }
-  vol = constrain(vol, 0.5, uv[VOLUME].val);
+  vol = constrain(vol, 0.5, uvVOLUME);
 }
 
 void binsToBands() {
@@ -95,11 +95,11 @@ float noteToFreq(float n) {
 
 void buildBins() {  // can count beyond samples/2 so needs some fixing
   float C_0 = 16.3515978312874;
-  float sampleRate = uv[SAMPLERATE].val;
+  float sampleRate = uvSAMPLERATE;
   float res = sampleRate / (1.0f * SAMPLES);
   int minBins = 1;
-  float nFirst = uv[FLOW].val;
-  float nLast = uv[FHIGH].val;
+  float nFirst = uvFLOW;
+  float nLast = uvFHIGH;
 
   // find the starting conditions
   float fnFirst = C_0 * powf(2, nFirst / 12.0f);  // determine the frequency of the first requested note

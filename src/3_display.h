@@ -76,7 +76,7 @@ void pushMenuLayer() {
 }
 
 void pushSpectLayer() {
-  int mode = uv[STYLE].val;
+  int mode = (int)uvSTYLE;
   float setting = styleSettings[mode].val;
 
   float fColourIndex;

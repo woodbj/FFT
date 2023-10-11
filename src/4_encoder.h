@@ -16,25 +16,20 @@ void applyChanges(){
           break;
 
         case SAMPLERATE:
-          sampling_period_us = 1e6 / uv[SAMPLERATE].val;
+          sampling_period_us = 1e6 / uvSAMPLERATE;
           buildBins();
           break;
 
-        case PEAKS:
-          peakWeights = uv[i].val;
-          break;
-
         case STYLE:
-          int style = uv[STYLE].val;
-          switch(style){
+          switch((int)uvSTYLE){
             case SPECTROGRAM:
-              uv[YSCALE].val = INT_POWER_DENSITY;
-              uv[GAIN].val = uv[GAIN].max;
+              uvYSCALE = INT_POWER_DENSITY;
+              uvGAIN = uv[GAIN].max;
               break;
 
             default: // COLOUR and RAINBOW
-              uv[YSCALE].val = DB_POWER_DENSITY;
-              uv[GAIN].val = 1;
+              uvYSCALE = DB_POWER_DENSITY;
+              uvGAIN = 1;
               break;
           }
       }
@@ -81,7 +76,7 @@ void changeMenu(int dir) {
     menuNum--;
     if (menuNum < 0) menuNum = 0;
   }
-  uv[STYLE_SETTING] = styleSettings[(int)uv[STYLE].val];
+  uv[STYLE_SETTING] = styleSettings[(int)uvSTYLE];
 }
 
 void swISR() {
@@ -133,7 +128,7 @@ void menu() {
     changeMenu(delta);
   } else {
     if(menuNum == STYLE_SETTING) {
-      editUserVariable(delta, &styleSettings[(int)uv[STYLE].val]);
+      editUserVariable(delta, &styleSettings[(int)uvSTYLE]);
     } else editUserVariable(delta, &uv[menuNum]);
   }
 
