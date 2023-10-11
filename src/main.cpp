@@ -11,11 +11,8 @@ void Sample(void *)
     buffer[bufferIndex] = adc1_get_raw((adc1_channel_t)MIC_PIN);
     bufferIndex++;
     bufferIndex %= bufferLen;
-    while ((micros() - newTime) < sampling_period_us)
-    {
-    }; // chill
-    if (bufferIndex == 0)
-      delay(1); // // keep the watchdog happy
+    while ((micros() - newTime) < sampling_period_us){}; // chill
+    if (bufferIndex == 0)delay(1); // // keep the watchdog happy
   }
 }
 
