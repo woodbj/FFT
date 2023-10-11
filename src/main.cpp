@@ -3,8 +3,7 @@
 void Sample(void *)
 {
 
-  unsigned int newTime;
-  unsigned int endTime;
+  unsigned long newTime;
 
   for (;;)
   {
@@ -21,11 +20,10 @@ void Compute(void *)
 {
   attachInterrupt(SW, swISR, RISING);
   attachInterrupt(CLK, enISR, CHANGE);
+  
   unsigned long tStart;
   unsigned int displayPeriod;
-  float displayHz;
-  unsigned int actualPeriod;
-  int colourMode = 0;
+
   delay(250);
   for (;;)
   {

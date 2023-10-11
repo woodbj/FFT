@@ -1,9 +1,8 @@
 
-void applyWindow(float ind) {
-  if((int)ind == RECTANGULAR) return;
-  int index = (int)ind;
+void applyWindow() {
+  if((int)uvWINDOW == RECTANGULAR) return;
   for (int i = 0; i < SAMPLES; i++) {
-    vRe[i] *= wj[index][i];
+    vRe[i] *= wj[(int)uvWINDOW][i];
   }
 }
 
@@ -34,7 +33,7 @@ void getMagnitude() {
 
 void computeSamples() {
   pushBuffer();
-  applyWindow(uvWINDOW);
+  applyWindow();
   FFT.Compute(FFT_FORWARD);
   getMagnitude();
 }
