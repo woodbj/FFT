@@ -94,7 +94,6 @@ enum Menu {
   SAMPLERATE,
   YSCALE,
   WINDOW,
-  OVERLAP,
   GAIN,
   VOLUME,
   MENU_COUNT
@@ -121,16 +120,12 @@ float uvFHIGH = 80;
 
 float uvYSCALE = INT_POWER_DENSITY;
 float uvWINDOW = HANNING;
-float uvOVERLAP = 50;
 float uvGAIN = 1;
 float uvVOLUME = 10;
 
 float uvSTYLE_SETTING_SPECTROGRAM = 0;
 float uvSTYLE_SETTING_COLOUR_BC = 0;
 float uvSTYLE_SETTING_RAINBOW_BC = 0;
-
-
-
 
 
 #define TITLE_LEN 20

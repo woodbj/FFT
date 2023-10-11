@@ -21,26 +21,32 @@ void Compute(void *)
   attachInterrupt(SW, swISR, RISING);
   attachInterrupt(CLK, enISR, CHANGE);
   
-  unsigned long tStart;
+  unsigned long tStart = millis();
   unsigned int displayPeriod;
-
-  delay(250);
+  int fat = 1000;
   for (;;)
   {
     tStart = micros();
+    tStart += fat;
     computeSamples();
     processSamples();
     menu();
     displaySamples();
     delay(1); // keep the watchdog happy
-    displayPeriod = SAMPLES * (1e6 / uvSAMPLERATE) * (1 - uvOVERLAP / 100.0f);
+    displayPeriod = 0.5 * sampling_period_us * SAMPLES;
     while (micros() - tStart < displayPeriod){} // chill
+    delayMicroseconds(fat);
+    
+    
   }
 }
 
 void setup()
 {
   // fill user variables
+
+  // change this to a series of funtions that all return a uv type. each funtions will vary depending on read/write, 
+  // addBasicMenu(menuNum, ptr, min, max, delta)
   strcpy(uv[VOLUME].title, "LOUD");
   uv[VOLUME].ptr = &uvVOLUME;
   uv[VOLUME].min = 0.6;
@@ -59,16 +65,9 @@ void setup()
   uv[WINDOW].max = WINDOW_COUNT - 1;
   uv[WINDOW].delta = 1;
 
-  strcpy(uv[OVERLAP].title, "OVLP");
-  uv[OVERLAP].ptr = &uvOVERLAP;
-  uv[OVERLAP].min = 0;
-  uv[OVERLAP].max = 50;
-  uv[OVERLAP].delta = 1;
-  uv[OVERLAP].fastEnable = true;
-  uv[OVERLAP].fastDelta = 5;
-
   strcpy(uv[SAMPLERATE].title, "SRAT");
   uv[SAMPLERATE].ptr = &uvSAMPLERATE;
+  uv[SAMPLERATE].val = uvSAMPLERATE;
   uv[SAMPLERATE].min = 15000;
   uv[SAMPLERATE].max = 35000;
   uv[SAMPLERATE].delta = 50;
@@ -134,6 +133,13 @@ void setup()
 
   uv[STYLE_SETTING] = styleSettings[(int)uv[STYLE].val];
 
+  
+  for (int i = 0; i < MENU_COUNT; i++){
+    editUserVariable(0, &uv[i]);
+    uv[i].changed = true;
+  }
+  applyChanges();
+
   // set up LEDs
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LED);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 1000);
@@ -176,7 +182,7 @@ void setup()
     wj[SINE][i] = sin(z / 2.0f);
   }
 
-  applyChanges();
+  
 
   xTaskCreatePinnedToCore(Sample, "Sample Task", STACK_SIZE, nullptr, 1, &sampler, 0);
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);

@@ -2,10 +2,11 @@
 
 
 void applyChanges(){
+  float localVal;
+  float globalVal;
   
   for (int i = 0; i < MENU_COUNT; i++){
     if(uv[i].changed){
-      uv[i].changed = false;
       switch(i){
         case FLOW:
           buildBins();
@@ -33,6 +34,7 @@ void applyChanges(){
               break;
           }
       }
+      uv[i].changed = false;
     }
   }
 }
@@ -57,10 +59,10 @@ void editUserVariable(int dir, UserVar_t* var) {
     else var->val = var->min;
   }
 
-  *var->ptr = var->val;
-  Serial.printf("ptr: %f\tval: %f\n", *var->ptr, var->val);
 
   var->changed = true;
+  *var->ptr = var->val;
+
 
   // tell the display what it needs to know to show the value bar
   currentValue = var->val;
