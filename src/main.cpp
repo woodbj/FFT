@@ -50,7 +50,7 @@ void setup()
   strcpy(uv[VOLUME].title, "LOUD");
   uv[VOLUME].ptr = &uvVOLUME;
   uv[VOLUME].min = 0.6;
-  uv[VOLUME].max = 10;
+  uv[VOLUME].max = 15;
   uv[VOLUME].delta = 1;
 
   strcpy(uv[GAIN].title, "GAIN");
