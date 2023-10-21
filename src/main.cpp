@@ -169,6 +169,10 @@ void setup()
 
   mic.begin(mic_settings);
 
+  pinMode(CLK, INPUT);
+  pinMode(SW, INPUT);
+  pinMode(DT, INPUT);
+
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);
 }
 

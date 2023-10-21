@@ -97,6 +97,7 @@ void swISR() {
 void enISR() {
   bool dt = digitalRead(DT);
   bool clk = digitalRead(CLK);
+  Serial.println("Interrupt");
 
   // debouncing
   if (millis() - debounceLastTime < debounce_ms) return;
@@ -128,6 +129,7 @@ void menu() {
   menuSelectTime = millis();
 
   float delta = (enIncrement - enDecrement);
+  Serial.println(delta);
 
   if (swPress) selectMenu = !selectMenu;
 

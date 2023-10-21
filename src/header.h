@@ -92,9 +92,7 @@ enum Menu {
   STYLE_SETTING,
   FLOW,
   FHIGH,
-  // SAMPLERATE,
   YSCALE,
-  // WINDOW,
   GAIN,
   VOLUME,
   MENU_COUNT

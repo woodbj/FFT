@@ -46,7 +46,6 @@ void scale() {
     vol += (loThreshold - counter) * volDelta;
   }
   vol = constrain(vol, uv[VOLUME].min, uvVOLUME);
-  Serial.println(vol);
 }
 
 void binsToBands() {
