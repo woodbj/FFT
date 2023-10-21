@@ -13,6 +13,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include "letters.h"
+#include "microphone.h"
 
 // LED Matrix
 #define FASTLED_INTERNAL
@@ -35,7 +36,7 @@ int title[NUM_LED];
 // FFT
 #include <arduinoFFT.h>
 #define SAMPLES 1024
-#define SAMPLE_FREQ 35000.0f  //25140.0f
+#define SAMPLE_FREQ 25140.0f  //25140.0f
 float uvSAMPLERATE = SAMPLE_FREQ;
 int firstBin;                 // value set by void buildBins()
 int binsPerBand[MAT_W] = { 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5, 5, 7, 7, 9, 11 };
@@ -167,6 +168,17 @@ int currentIndex;
 #define STACK_SIZE 2*4096
 TaskHandle_t sampler;
 TaskHandle_t computer;
+
+
+#define I2S_WS 18
+#define I2S_SCK 33
+#define I2S_SD 34
+
+
+
+Microphone mic;
+
+int16_t samples[SAMPLES];
 
 
 #include "utilities.h"

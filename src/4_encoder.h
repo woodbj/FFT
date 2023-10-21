@@ -19,6 +19,7 @@ void applyChanges(){
         case SAMPLERATE:
           sampling_period_us = 1e6 / uvSAMPLERATE;
           buildBins();
+          // mic.setSampleRate(uvSAMPLERATE);
           break;
 
         case STYLE:

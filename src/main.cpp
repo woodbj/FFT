@@ -11,8 +11,11 @@ void Sample(void *)
     buffer[bufferIndex] = adc1_get_raw((adc1_channel_t)MIC_PIN);
     bufferIndex++;
     bufferIndex %= bufferLen;
-    while ((micros() - newTime) < sampling_period_us){}; // chill
-    if (bufferIndex == 0)delay(1); // // keep the watchdog happy
+    while ((micros() - newTime) < sampling_period_us)
+    {
+    }; // chill
+    if (bufferIndex == 0)
+      delay(1); // // keep the watchdog happy
   }
 }
 
@@ -20,7 +23,7 @@ void Compute(void *)
 {
   attachInterrupt(SW, swISR, RISING);
   attachInterrupt(CLK, enISR, CHANGE);
-  
+
   unsigned long tStart = millis();
   unsigned int displayPeriod;
   int fat = 1000;
@@ -28,16 +31,19 @@ void Compute(void *)
   {
     tStart = micros();
     tStart += fat;
+
+    mic.getBuffer(samples);
+
     computeSamples();
     processSamples();
     menu();
     displaySamples();
     delay(1); // keep the watchdog happy
     displayPeriod = 0.5 * sampling_period_us * SAMPLES;
-    while (micros() - tStart < displayPeriod){} // chill
+    while (micros() - tStart < displayPeriod)
+    {
+    } // chill
     delayMicroseconds(fat);
-    
-    
   }
 }
 
@@ -45,7 +51,7 @@ void setup()
 {
   // fill user variables
 
-  // change this to a series of funtions that all return a uv type. each funtions will vary depending on read/write, 
+  // change this to a series of funtions that all return a uv type. each funtions will vary depending on read/write,
   // addBasicMenu(menuNum, ptr, min, max, delta)
   strcpy(uv[VOLUME].title, "LOUD");
   uv[VOLUME].ptr = &uvVOLUME;
@@ -133,8 +139,8 @@ void setup()
 
   uv[STYLE_SETTING] = styleSettings[(int)uv[STYLE].val];
 
-  
-  for (int i = 0; i < MENU_COUNT; i++){
+  for (int i = 0; i < MENU_COUNT; i++)
+  {
     editUserVariable(0, &uv[i]);
     uv[i].changed = true;
   }
@@ -182,11 +188,17 @@ void setup()
     wj[SINE][i] = sin(z / 2.0f);
   }
 
-  
+  Mic_Settings_t mic_settings;
+  mic_settings.ws = I2S_WS;
+  mic_settings.sck = I2S_SCK;
+  mic_settings.sd = I2S_SD;
+  mic_settings.sample_rate = SAMPLE_FREQ;
+  mic_settings.sample_count = SAMPLES;
 
-  xTaskCreatePinnedToCore(Sample, "Sample Task", STACK_SIZE, nullptr, 1, &sampler, 0);
+  mic.begin(mic_settings);
+
+  // xTaskCreatePinnedToCore(Sample, "Sample Task", STACK_SIZE, nullptr, 1, &sampler, 0);
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);
-
 }
 
 void loop()

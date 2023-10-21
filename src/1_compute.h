@@ -19,6 +19,13 @@ void pushBuffer() {
   }
 }
 
+void prepareInput(){
+  for (int i = 0; i < SAMPLES; i++){
+    vRe[i] = samples[i];
+    vIm[i] = 0;
+  }
+}
+
 void getMagnitude() {
   float real;
   float imag;
@@ -32,7 +39,7 @@ void getMagnitude() {
 }
 
 void computeSamples() {
-  pushBuffer();
+  prepareInput();
   applyWindow();
   FFT.Compute(FFT_FORWARD);
   getMagnitude();
