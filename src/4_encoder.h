@@ -17,13 +17,6 @@ void applyChanges(){
           buildBins();
           break;
 
-        // case SAMPLERATE:
-        //   sampling_period_us = 1e6 / uvSAMPLERATE;
-        //   buildBins();
-        //   intval = uvSAMPLERATE;
-        //   mic.setSampleRate(intval);
-        //   break;
-
         case STYLE:
           switch((int)uvSTYLE){
             case SPECTROGRAM:
@@ -48,6 +41,8 @@ void editUserVariable(int dir, UserVar_t* var) {
 
   if (fastTurn && var->fastEnable) delta = var->fastDelta;
   else delta = var->delta;
+
+  var->val = *var->ptr;
 
   var->val += dir * delta;
 
@@ -97,7 +92,6 @@ void swISR() {
 void enISR() {
   bool dt = digitalRead(DT);
   bool clk = digitalRead(CLK);
-  Serial.println("Interrupt");
 
   // debouncing
   if (millis() - debounceLastTime < debounce_ms) return;

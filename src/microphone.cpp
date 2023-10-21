@@ -52,11 +52,13 @@ void Microphone::getBuffer(int16_t *output)
     int offset;
     const int numsamples = settings.sample_count;
     uint16_t newResult[numsamples];
+    unsigned long tstart;
 
     i2s_read(settings.I2S_PORT, newResult, settings.sample_count * BYTES_PER_SAMPLE, &bytesCollected, portMAX_DELAY);
 
     samplesCollected = bytesCollected / 2;
     offset = settings.sample_count - samplesCollected;
+    Serial.println(samplesCollected);
 
     for (int i = 0; i < offset; i++)
     { // shift old values
@@ -73,7 +75,4 @@ uint32_t Microphone::getSampleRate(){
 }
 
 void Microphone::setSampleRate(uint32_t rate){
-    Serial.printf("\nRequested Sample Rate %f", rate);
-    
-    // i2s_set_sample_rates(settings.I2S_PORT, rate * BITS_PER_SAMPLE);
 }

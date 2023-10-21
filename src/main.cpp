@@ -1,58 +1,43 @@
 #include "header.h"
 
-// void Sample(void *)
-// {
-
-//   unsigned long newTime;
-
-//   for (;;)
-//   {
-//     newTime = micros();
-//     buffer[bufferIndex] = adc1_get_raw((adc1_channel_t)MIC_PIN);
-//     bufferIndex++;
-//     bufferIndex %= bufferLen;
-//     while ((micros() - newTime) < sampling_period_us)
-//     {
-//     }; // chill
-//     if (bufferIndex == 0)
-//       delay(1); // // keep the watchdog happy
-//   }
-// }
-
 void Compute(void *)
 {
-  attachInterrupt(SW, swISR, RISING);
-  attachInterrupt(CLK, enISR, CHANGE);
-
   unsigned long tStart = millis();
   unsigned int displayPeriod;
   int fat = 1000;
+  Queue_Message_t message = READY_TO_PROCESS;
   for (;;)
   {
-    tStart = micros();
-    tStart += fat;
-
     mic.getBuffer(samples);
-
     computeSamples();
-    processSamples();
-    menu();
-    displaySamples();
+    xQueueSend(queue, &message, portMAX_DELAY);
     delay(1); // keep the watchdog happy
-    displayPeriod = 0.5 * sampling_period_us * SAMPLES;
-    while (micros() - tStart < displayPeriod)
+  }
+}
+
+void Process(void *)
+{
+  attachInterrupt(SW, swISR, RISING);
+  attachInterrupt(CLK, enISR, CHANGE);
+  Queue_Message_t message;
+  unsigned long tStart;
+  for (;;)
+  {
+    if (xQueueReceive(queue, &message, portMAX_DELAY) == pdTRUE && message == READY_TO_PROCESS)
     {
-    } // chill
-    delayMicroseconds(fat);
+      tStart = micros();
+      processSamples();
+      menu();
+      displaySamples();
+    }
   }
 }
 
 void setup()
 {
-  // fill user variables
 
-  // change this to a series of funtions that all return a uv type. each funtions will vary depending on read/write,
-  // addBasicMenu(menuNum, ptr, min, max, delta)
+  queue = xQueueCreate(1, sizeof(Queue_Message_t));
+  // fill user variables
   strcpy(uv[VOLUME].title, "LOUD");
   uv[VOLUME].ptr = &uvVOLUME;
   uv[VOLUME].min = 0.1;
@@ -174,6 +159,7 @@ void setup()
   pinMode(DT, INPUT);
 
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);
+  xTaskCreatePinnedToCore(Process, "Process Task", STACK_SIZE, nullptr, 1, &processor, 0);
 }
 
 void loop()

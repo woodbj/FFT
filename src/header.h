@@ -56,13 +56,6 @@ enum Windows {
 
 float wj[WINDOW_COUNT][SAMPLES];
 
-// // Microphone
-// #include <driver/adc.h>
-// #define MIC_PIN ADC1_CHANNEL_1  //GPIO2
-// const int bufferLen = 2 * SAMPLES;
-// int bufferIndex = 0;
-// double buffer[bufferLen];
-
 // Bands
 float bandValues[MAT_W];
 const int avgSamples = 100;
@@ -164,9 +157,13 @@ int currentIndex;
 
 // RTOS
 #define STACK_SIZE 2*4096
-TaskHandle_t sampler;
+TaskHandle_t processor;
 TaskHandle_t computer;
+QueueHandle_t queue;
 
+typedef enum{
+  READY_TO_PROCESS
+}Queue_Message_t;
 
 #define I2S_WS 18
 #define I2S_SCK 33
