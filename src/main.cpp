@@ -55,8 +55,8 @@ void setup()
   // addBasicMenu(menuNum, ptr, min, max, delta)
   strcpy(uv[VOLUME].title, "LOUD");
   uv[VOLUME].ptr = &uvVOLUME;
-  uv[VOLUME].min = 0.6;
-  uv[VOLUME].max = 15;
+  uv[VOLUME].min = 0.1;
+  uv[VOLUME].max = 10;
   uv[VOLUME].delta = 1;
 
   strcpy(uv[GAIN].title, "GAIN");
@@ -65,20 +65,20 @@ void setup()
   uv[GAIN].min = 0.5;
   uv[GAIN].max = 1.5;
 
-  strcpy(uv[WINDOW].title, "WIN");
-  uv[WINDOW].ptr = &uvWINDOW;
-  uv[WINDOW].min = 0;
-  uv[WINDOW].max = WINDOW_COUNT - 1;
-  uv[WINDOW].delta = 1;
+  // strcpy(uv[WINDOW].title, "WIN");
+  // uv[WINDOW].ptr = &uvWINDOW;
+  // uv[WINDOW].min = 0;
+  // uv[WINDOW].max = WINDOW_COUNT - 1;
+  // uv[WINDOW].delta = 1;
 
-  strcpy(uv[SAMPLERATE].title, "SRAT");
-  uv[SAMPLERATE].ptr = &uvSAMPLERATE;
-  uv[SAMPLERATE].val = uvSAMPLERATE;
-  uv[SAMPLERATE].min = 15000;
-  uv[SAMPLERATE].max = 35000;
-  uv[SAMPLERATE].delta = 50;
-  uv[SAMPLERATE].fastEnable = true;
-  uv[SAMPLERATE].fastDelta = 1000;
+  // strcpy(uv[SAMPLERATE].title, "SRAT");
+  // uv[SAMPLERATE].ptr = &uvSAMPLERATE;
+  // uv[SAMPLERATE].val = uvSAMPLERATE;
+  // uv[SAMPLERATE].min = 15000;
+  // uv[SAMPLERATE].max = 35000;
+  // uv[SAMPLERATE].delta = 50;
+  // uv[SAMPLERATE].fastEnable = true;
+  // uv[SAMPLERATE].fastDelta = 1000;
 
   strcpy(uv[FLOW].title, "LO");
   uv[FLOW].ptr = &uvFLOW;
@@ -139,12 +139,14 @@ void setup()
 
   uv[STYLE_SETTING] = styleSettings[(int)uv[STYLE].val];
 
-  for (int i = 0; i < MENU_COUNT; i++)
-  {
-    editUserVariable(0, &uv[i]);
-    uv[i].changed = true;
-  }
-  applyChanges();
+  // for (int i = 0; i < MENU_COUNT; i++)
+  // {
+  //   editUserVariable(0, &uv[i]);
+  //   uv[i].changed = true;
+  // }
+  // applyChanges();
+
+  buildBins();
 
   // set up LEDs
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LED);

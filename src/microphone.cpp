@@ -73,5 +73,7 @@ uint32_t Microphone::getSampleRate(){
 }
 
 void Microphone::setSampleRate(uint32_t rate){
-    i2s_set_sample_rates(settings.I2S_PORT, rate * BITS_PER_SAMPLE);
+    Serial.printf("\nRequested Sample Rate %f", rate);
+    
+    // i2s_set_sample_rates(settings.I2S_PORT, rate * BITS_PER_SAMPLE);
 }

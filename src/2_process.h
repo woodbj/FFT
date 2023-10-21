@@ -28,8 +28,8 @@ void scale() {
   int counter = 0;
   static float vol = 1;
   float volDelta = 0.01;
-  int loThreshold = 4;
-  int hiThreshold = 8;
+  int loThreshold = 3;
+  int hiThreshold = 6;
 
   for (int band = 0; band < MAT_W; band++) {
     val = bandValues[band];
@@ -41,11 +41,12 @@ void scale() {
   }
 
   if (counter > hiThreshold) {
-    vol -= volDelta;
+    vol -= (counter - hiThreshold) * volDelta;
   } else if (counter < loThreshold) {
-    vol += volDelta;
+    vol += (loThreshold - counter) * volDelta;
   }
-  vol = constrain(vol, 0.5, uvVOLUME);
+  vol = constrain(vol, uv[VOLUME].min, uvVOLUME);
+  Serial.println(vol);
 }
 
 void binsToBands() {

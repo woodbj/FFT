@@ -4,6 +4,7 @@
 void applyChanges(){
   float localVal;
   float globalVal;
+  int intval;
   
   for (int i = 0; i < MENU_COUNT; i++){
     if(uv[i].changed){
@@ -16,11 +17,12 @@ void applyChanges(){
           buildBins();
           break;
 
-        case SAMPLERATE:
-          sampling_period_us = 1e6 / uvSAMPLERATE;
-          buildBins();
-          // mic.setSampleRate(uvSAMPLERATE);
-          break;
+        // case SAMPLERATE:
+        //   sampling_period_us = 1e6 / uvSAMPLERATE;
+        //   buildBins();
+        //   intval = uvSAMPLERATE;
+        //   mic.setSampleRate(intval);
+        //   break;
 
         case STYLE:
           switch((int)uvSTYLE){

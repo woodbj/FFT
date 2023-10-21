@@ -10,7 +10,7 @@ This header includes everything needed to install and run an i2s microphone
 #include <Arduino.h>
 #endif
 
-#define SAMPLES_PER_DMA_BUFFER 128
+#define SAMPLES_PER_DMA_BUFFER 64
 #define BITS_PER_SAMPLE I2S_BITS_PER_SAMPLE_16BIT
 #define BYTES_PER_SAMPLE (BITS_PER_SAMPLE / 8)
 #define BYTES_PER_DMA_BUFFER (SAMPLES_PER_DMA_BUFFER * BYTES_PER_SAMPLE)

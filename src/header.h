@@ -36,7 +36,7 @@ int title[NUM_LED];
 // FFT
 #include <arduinoFFT.h>
 #define SAMPLES 1024
-#define SAMPLE_FREQ 25140.0f  //25140.0f
+#define SAMPLE_FREQ 30000.0f  //25140.0f
 float uvSAMPLERATE = SAMPLE_FREQ;
 int firstBin;                 // value set by void buildBins()
 int binsPerBand[MAT_W] = { 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5, 5, 7, 7, 9, 11 };
@@ -92,9 +92,9 @@ enum Menu {
   STYLE_SETTING,
   FLOW,
   FHIGH,
-  SAMPLERATE,
+  // SAMPLERATE,
   YSCALE,
-  WINDOW,
+  // WINDOW,
   GAIN,
   VOLUME,
   MENU_COUNT
@@ -122,7 +122,7 @@ float uvFHIGH = 80;
 float uvYSCALE = INT_POWER_DENSITY;
 float uvWINDOW = HANNING;
 float uvGAIN = 1;
-float uvVOLUME = 10;
+float uvVOLUME = 7;
 
 float uvSTYLE_SETTING_SPECTROGRAM = 0;
 float uvSTYLE_SETTING_COLOUR_BC = 0;
