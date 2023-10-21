@@ -1,23 +1,23 @@
 #include "header.h"
 
-void Sample(void *)
-{
+// void Sample(void *)
+// {
 
-  unsigned long newTime;
+//   unsigned long newTime;
 
-  for (;;)
-  {
-    newTime = micros();
-    buffer[bufferIndex] = adc1_get_raw((adc1_channel_t)MIC_PIN);
-    bufferIndex++;
-    bufferIndex %= bufferLen;
-    while ((micros() - newTime) < sampling_period_us)
-    {
-    }; // chill
-    if (bufferIndex == 0)
-      delay(1); // // keep the watchdog happy
-  }
-}
+//   for (;;)
+//   {
+//     newTime = micros();
+//     buffer[bufferIndex] = adc1_get_raw((adc1_channel_t)MIC_PIN);
+//     bufferIndex++;
+//     bufferIndex %= bufferLen;
+//     while ((micros() - newTime) < sampling_period_us)
+//     {
+//     }; // chill
+//     if (bufferIndex == 0)
+//       delay(1); // // keep the watchdog happy
+//   }
+// }
 
 void Compute(void *)
 {
@@ -64,21 +64,6 @@ void setup()
   uv[GAIN].delta = 0.1;
   uv[GAIN].min = 0.5;
   uv[GAIN].max = 1.5;
-
-  // strcpy(uv[WINDOW].title, "WIN");
-  // uv[WINDOW].ptr = &uvWINDOW;
-  // uv[WINDOW].min = 0;
-  // uv[WINDOW].max = WINDOW_COUNT - 1;
-  // uv[WINDOW].delta = 1;
-
-  // strcpy(uv[SAMPLERATE].title, "SRAT");
-  // uv[SAMPLERATE].ptr = &uvSAMPLERATE;
-  // uv[SAMPLERATE].val = uvSAMPLERATE;
-  // uv[SAMPLERATE].min = 15000;
-  // uv[SAMPLERATE].max = 35000;
-  // uv[SAMPLERATE].delta = 50;
-  // uv[SAMPLERATE].fastEnable = true;
-  // uv[SAMPLERATE].fastDelta = 1000;
 
   strcpy(uv[FLOW].title, "LO");
   uv[FLOW].ptr = &uvFLOW;
@@ -139,13 +124,6 @@ void setup()
 
   uv[STYLE_SETTING] = styleSettings[(int)uv[STYLE].val];
 
-  // for (int i = 0; i < MENU_COUNT; i++)
-  // {
-  //   editUserVariable(0, &uv[i]);
-  //   uv[i].changed = true;
-  // }
-  // applyChanges();
-
   buildBins();
 
   // set up LEDs
@@ -155,14 +133,6 @@ void setup()
 
   // set up serial
   Serial.begin(115200);
-
-  // set up pins
-  adc1_config_width(ADC_WIDTH_12Bit);
-  adc1_config_channel_atten(MIC_PIN, ADC_ATTEN_11db);
-  pinMode(MIC_PIN, INPUT);
-  pinMode(CLK, INPUT);
-  pinMode(SW, INPUT);
-  pinMode(DT, INPUT);
 
   // Pre-fill the integral array so averaging isn't way up the fuck at the start
   for (int i = 0; i < avgSamples; i++)
@@ -199,7 +169,6 @@ void setup()
 
   mic.begin(mic_settings);
 
-  // xTaskCreatePinnedToCore(Sample, "Sample Task", STACK_SIZE, nullptr, 1, &sampler, 0);
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);
 }
 

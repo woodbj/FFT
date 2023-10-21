@@ -56,12 +56,12 @@ enum Windows {
 
 float wj[WINDOW_COUNT][SAMPLES];
 
-// Microphone
-#include <driver/adc.h>
-#define MIC_PIN ADC1_CHANNEL_1  //GPIO2
-const int bufferLen = 2 * SAMPLES;
-int bufferIndex = 0;
-double buffer[bufferLen];
+// // Microphone
+// #include <driver/adc.h>
+// #define MIC_PIN ADC1_CHANNEL_1  //GPIO2
+// const int bufferLen = 2 * SAMPLES;
+// int bufferIndex = 0;
+// double buffer[bufferLen];
 
 // Bands
 float bandValues[MAT_W];
