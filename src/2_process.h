@@ -28,7 +28,7 @@ void scale() {
   int counter = 0;
   static float vol = 1;
   float volDelta = 0.01;
-  int loThreshold = 3;
+  int loThreshold = 1;
   int hiThreshold = 6;
 
   for (int band = 0; band < MAT_W; band++) {
