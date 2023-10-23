@@ -5,7 +5,7 @@
  * @brief This function initiates the I2S port
  *
  * @param settings Mic_Settings_t struct contains the necessary parameters to start the I2S
- * 
+ *
  * @note doesn't seem to overlap as expected...
  */
 void Microphone::begin(Mic_Settings_t _settings)
@@ -47,34 +47,43 @@ void Microphone::begin(Mic_Settings_t _settings)
  *
  * !BEWARE! this parameter must not be altered between calls to this function or backfilling willl be compromised
  */
-void Microphone::getBuffer(int16_t *output)
+void Microphone::getBuffer(sampletype_t *input)
 {
     size_t bytesCollected;
     size_t samplesCollected;
     int offset;
     const int numsamples = settings.sample_count;
-    uint16_t newResult[numsamples];
-    unsigned long tstart;
+    sampletype_t i2sread[numsamples];
+    sampletype_t output[numsamples];
 
-    i2s_read(settings.I2S_PORT, newResult, settings.sample_count * BYTES_PER_SAMPLE, &bytesCollected, portMAX_DELAY);
+    unsigned long tstart = micros();
+
+    i2s_read(settings.I2S_PORT, i2sread, numsamples * BYTES_PER_SAMPLE, &bytesCollected, 0);
 
     samplesCollected = bytesCollected / 2;
     offset = settings.sample_count - samplesCollected;
+
     Serial.println(samplesCollected);
 
     for (int i = 0; i < offset; i++)
-    { // shift old values
-        output[i] = output[settings.sample_count - offset + i];
+    {
+        output[i] = input[numsamples - offset + i];
     }
-    for (int i = offset; i < settings.sample_count - offset; i++)
-    { // enter new values
-        output[i + offset] = newResult[i];
+    for (int i = offset; i < numsamples; i++)
+    {
+        output[i] = i2sread[i - offset];
     }
+    for (int i = 0; i < numsamples; i++){
+        input[i] = output[i];
+    }
+    delay(1);
 }
 
-uint32_t Microphone::getSampleRate(){
+uint32_t Microphone::getSampleRate()
+{
     return settings.sample_rate;
 }
 
-void Microphone::setSampleRate(uint32_t rate){
+void Microphone::setSampleRate(uint32_t rate)
+{
 }

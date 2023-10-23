@@ -36,7 +36,7 @@ int title[NUM_LED];
 // FFT
 #include <arduinoFFT.h>
 #define SAMPLES 1024
-#define SAMPLE_FREQ 25000.0f  //25140.0f
+#define SAMPLE_FREQ 10240.0f  //25140.0f
 float uvSAMPLERATE = SAMPLE_FREQ;
 int firstBin;                 // value set by void buildBins()
 int binsPerBand[MAT_W] = { 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5, 5, 7, 7, 9, 11 };
@@ -173,7 +173,7 @@ typedef enum{
 
 Microphone mic;
 
-int16_t samples[SAMPLES];
+sampletype_t samples[SAMPLES];
 
 
 #include "utilities.h"
