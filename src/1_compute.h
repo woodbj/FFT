@@ -3,7 +3,7 @@ void applyWindow() {
   if((int)uvWINDOW == RECTANGULAR) return;
   for (int i = 0; i < SAMPLES; i++) {
     // vRe[i] *= wj[(int)uvWINDOW][i];
-    vRe[i] *= wj[HAMMING][i];
+    vRe[i] *= wj[HANNING][i];
   }
 }
 

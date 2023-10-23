@@ -5,6 +5,8 @@
  * @brief This function initiates the I2S port
  *
  * @param settings Mic_Settings_t struct contains the necessary parameters to start the I2S
+ * 
+ * @note doesn't seem to overlap as expected...
  */
 void Microphone::begin(Mic_Settings_t _settings)
 {
