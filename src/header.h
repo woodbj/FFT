@@ -14,6 +14,7 @@
 #include <math.h>
 #include "letters.h"
 #include "microphone.h"
+#include "process.h"
 
 // LED Matrix
 #define FASTLED_INTERNAL
@@ -36,10 +37,8 @@ int title[NUM_LED];
 // FFT
 #include <arduinoFFT.h>
 #define SAMPLES 1024
-#define SAMPLE_FREQ 20480.0f  //25140.0f
-float uvSAMPLERATE = SAMPLE_FREQ;
-int firstBin;                 // value set by void buildBins()
-int binsPerBand[MAT_W] = { 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5, 5, 7, 7, 9, 11 };
+#define SAMPLE_FREQ 31250  //25140.0f
+
 double vRe[SAMPLES];
 double vIm[SAMPLES];
 arduinoFFT FFT = arduinoFFT(vRe, vIm, SAMPLES, SAMPLE_FREQ);
@@ -58,9 +57,19 @@ float wj[WINDOW_COUNT][SAMPLES];
 
 // Bands
 float bandValues[MAT_W];
-const int avgSamples = 100;
-int avgCounter = 0;
-float integral[avgSamples];
+int binsPerBand[MAT_W];
+Processor_Parameters_t param = {
+  .sampleRate = SAMPLE_FREQ,
+  .sampleCount = SAMPLES,
+  .bandCount = MAT_W,
+  .bandValues = bandValues,
+  .vRe = vRe,
+  .binsPerBand = binsPerBand
+};
+
+Processor processor = Processor(param);
+
+
 
 // Encoder
 #define CLK 13  // blue wire
@@ -80,84 +89,14 @@ int debounce_ms = 5;
 #include "palettes.h"
 CRGB menuColour = CRGB::White;
 
-enum Menu {
-  STYLE,
-  STYLE_SETTING,
-  FLOW,
-  FHIGH,
-  YSCALE,
-  GAIN,
-  VOLUME,
-  MENU_COUNT
-};
-
-enum Y_Scales {
-  DB_POWER_DENSITY,
-  INT_POWER_DENSITY,
-  LAST_YSCALE
-};
-
-enum Styles {
-  SPECTROGRAM,
-  COLOUR_BC,
-  RAINBOW_BC,
-  COLOUR_BCW,
-  RAINBOW_BCW,
-  LAST_STYLE
-};
-
-float uvSTYLE = SPECTROGRAM;
-float uvFLOW = 32;
-float uvFHIGH = 80;
-
-float uvYSCALE = INT_POWER_DENSITY;
-float uvWINDOW = HANNING;
-float uvGAIN = 1;
-float uvVOLUME = 7;
-
-float uvSTYLE_SETTING_SPECTROGRAM = 0;
-float uvSTYLE_SETTING_COLOUR_BC = 0;
-float uvSTYLE_SETTING_RAINBOW_BC = 0;
 
 
 #define TITLE_LEN 20
-typedef struct {
-  float *ptr;
-  float val;
-  float min;
-  float max;
-  float delta;
-  float fastDelta;
-  bool fastEnable = false;
-  bool rollover = false;
-  bool showValueBar = true;
-  bool reverseValueBar = false;
-  char title[TITLE_LEN];
-  bool changed = true;
-} UserVar_t;
 
-UserVar_t uv[MENU_COUNT];
-UserVar_t styleSettings[LAST_STYLE];
-
-
-float uvSampleAvg = 0;
-
-Cursor_t cursor;
-
-int menuSelectTime = -5000;  // used to only show the menu bar for a set time
-int menuNum = 0;             // current menu being navigated (refer enum Menu)
-bool selectMenu = true;      // track whether it's a menu or variable being manipulated
-bool menuGo = false;         // for ISR to tell the loop if a menu action needs to be taken
-
-// used to manage the value bar
-float currentMin;
-float currentMax;
-float currentValue;
-int currentIndex;
 
 // RTOS
 #define STACK_SIZE 2*4096
-TaskHandle_t processor;
+TaskHandle_t processtask;
 TaskHandle_t computer;
 QueueHandle_t queue;
 
@@ -178,6 +117,5 @@ sampletype_t samples[SAMPLES];
 
 #include "utilities.h"
 #include "1_compute.h"
-#include "2_process.h"
 #include "3_display.h"
 #include "4_encoder.h"
