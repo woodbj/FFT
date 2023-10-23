@@ -2,21 +2,15 @@
 
 void Compute(void *)
 {
-  unsigned long tStart = millis();
-  unsigned int displayPeriod;
-  int fat = 1000;
-  int frameRate = 30;
-  int framePeriod = 1e6 / frameRate;
   Queue_Message_t message = READY_TO_PROCESS;
   for (;;)
   {
-    tStart = micros();
+    capFPS(35);
     mic.getBuffer(samples);
-    
     computeSamples();
     xQueueSend(queue, &message, portMAX_DELAY);
-    delay(1); // keep the watchdog happy
-    while(micros() - tStart < framePeriod){}
+
+    
   }
 }
 
@@ -30,7 +24,6 @@ void Process(void *)
   {
     if (xQueueReceive(queue, &message, portMAX_DELAY) == pdTRUE && message == READY_TO_PROCESS)
     {
-      tStart = micros();
       processSamples();
       menu();
       displaySamples();

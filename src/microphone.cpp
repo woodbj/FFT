@@ -63,7 +63,6 @@ void Microphone::getBuffer(sampletype_t *input)
     samplesCollected = bytesCollected / 2;
     offset = settings.sample_count - samplesCollected;
 
-    Serial.println(samplesCollected);
 
     for (int i = 0; i < offset; i++)
     {

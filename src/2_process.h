@@ -2,7 +2,7 @@
 
 void yAxis()
 {
-  float res = uvSAMPLERATE / (1.0f * SAMPLES);
+  float res = SAMPLE_FREQ / (1.0f * SAMPLES);
   float binf;
   int scaleCase = (int)uvYSCALE;
 
