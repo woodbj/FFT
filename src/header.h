@@ -68,20 +68,6 @@ Processor_Parameters_t param = {
 
 Processor processor = Processor(param);
 
-// Encoder
-#define CLK 13 // blue wire
-#define SW 14  // yellow wire
-#define DT 15  // white wire
-bool swPress = false;
-bool enIncrement = false;
-bool enDecrement = false;
-bool fastTurn = false;
-int fastMult = 30;
-unsigned int lastClick = millis();
-unsigned int enCounter = 0;
-int debounceLastTime = millis();
-int debounce_ms = 5;
-
 // user variables
 #include "palettes.h"
 CRGB menuColour = CRGB::White;
@@ -102,9 +88,13 @@ typedef enum
   READY_TO_PROCESS
 } Queue_Message_t;
 
+
+// Microphone
 #define I2S_WS 18
 #define I2S_SCK 33
 #define I2S_SD 34
+
+sampletype_t samples[SAMPLES];
 
 Mic_Settings_t mic_settings = {
   .ws = I2S_WS,
@@ -115,9 +105,8 @@ Mic_Settings_t mic_settings = {
 
 Microphone mic = Microphone(mic_settings);
 
-sampletype_t samples[SAMPLES];
+
 
 #include "utilities.h"
 #include "1_compute.h"
 #include "3_display.h"
-#include "4_encoder.h"

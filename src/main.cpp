@@ -14,8 +14,6 @@ void Compute(void *)
 
 void ProcessTask(void *)
 {
-  attachInterrupt(SW, swISR, RISING);
-  attachInterrupt(CLK, enISR, CHANGE);
   Queue_Message_t message;
   unsigned long tStart;
   for (;;)
@@ -63,17 +61,7 @@ void setup()
     wj[SINE][i] = sin(z / 2.0f);
   }
 
-  Mic_Settings_t mic_settings;
-  mic_settings.ws = I2S_WS;
-  mic_settings.sck = I2S_SCK;
-  mic_settings.sd = I2S_SD;
-  mic_settings.sample_rate = SAMPLE_FREQ;
-  mic_settings.sample_count = SAMPLES;
 
-
-  pinMode(CLK, INPUT);
-  pinMode(SW, INPUT);
-  pinMode(DT, INPUT);
 
   xTaskCreatePinnedToCore(Compute, "Compute Task", STACK_SIZE, nullptr, 1, &computer, 1);
   xTaskCreatePinnedToCore(ProcessTask, "Process Task", STACK_SIZE, nullptr, 1, &processtask, 0);
