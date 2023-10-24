@@ -21,33 +21,14 @@ void ProcessTask(void *)
     if (xQueueReceive(queue, &message, portMAX_DELAY) == pdTRUE && message == READY_TO_PROCESS)
     {
       processor.go();
-      displaySamples();
+      matrix.go();
     }
   }
 }
 
 void setup()
 {
-
-  
-
-  // set up LEDs
-  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LED);
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, 1000);
-  FastLED.setBrightness(100);
-
-  // set up serial
   Serial.begin(115200);
-
-  for (int band = 0; band < MAT_W; band++)
-  {
-    bandValues[band] = 0;
-  }
-
-  for (int led = 0; led < NUM_LED; led++)
-  {
-    spect[led] = CRGB::Black;
-  }
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));
 
