@@ -8,7 +8,7 @@
  *
  * @note doesn't seem to overlap as expected...
  */
-void Microphone::begin(Mic_Settings_t _settings)
+Microphone::Microphone(Mic_Settings_t _settings)
 {
     settings = _settings;
 
@@ -33,8 +33,8 @@ void Microphone::begin(Mic_Settings_t _settings)
         .data_out_num = -1,
         .data_in_num = settings.sd};
 
-    i2s_driver_install(settings.I2S_PORT, &i2s_config, 0, NULL);
-    i2s_set_pin(settings.I2S_PORT, &pin_config);
+    i2s_driver_install(I2S_PORT, &i2s_config, 0, NULL);
+    i2s_set_pin(I2S_PORT, &pin_config);
 }
 
 /**
@@ -58,7 +58,7 @@ void Microphone::getBuffer(sampletype_t *input)
 
     unsigned long tstart = micros();
 
-    i2s_read(settings.I2S_PORT, i2sread, numsamples * BYTES_PER_SAMPLE, &bytesCollected, 0);
+    i2s_read(I2S_PORT, i2sread, numsamples * BYTES_PER_SAMPLE, &bytesCollected, 0);
 
     samplesCollected = bytesCollected / 2;
     offset = settings.sample_count - samplesCollected;

@@ -8,11 +8,11 @@
 // v0.7 [BUGGY] added a dynamic menu to better account for style-specific settings. loses track of the style settings
 // v0.8 added palette selections. Fixed the v0.7 bug
 
-
 // General inclusions
 #include <Arduino.h>
 #include <math.h>
 #include "letters.h"
+
 #include "microphone.h"
 #include "process.h"
 
@@ -37,7 +37,7 @@ int title[NUM_LED];
 // FFT
 #include <arduinoFFT.h>
 #define SAMPLES 1024
-#define SAMPLE_FREQ 31250  //25140.0f
+#define SAMPLE_FREQ 31250 // 25140.0f
 
 double vRe[SAMPLES];
 double vIm[SAMPLES];
@@ -59,22 +59,19 @@ float wj[WINDOW_COUNT][SAMPLES];
 float bandValues[MAT_W];
 int binsPerBand[MAT_W];
 Processor_Parameters_t param = {
-  .sampleRate = SAMPLE_FREQ,
-  .sampleCount = SAMPLES,
-  .bandCount = MAT_W,
-  .bandValues = bandValues,
-  .vRe = vRe,
-  .binsPerBand = binsPerBand
-};
+    .sampleRate = SAMPLE_FREQ,
+    .sampleCount = SAMPLES,
+    .bandCount = MAT_W,
+    .bandValues = bandValues,
+    .vRe = vRe,
+    .binsPerBand = binsPerBand};
 
 Processor processor = Processor(param);
 
-
-
 // Encoder
-#define CLK 13  // blue wire
-#define SW 14   // yellow wire
-#define DT 15   // white wire
+#define CLK 13 // blue wire
+#define SW 14  // yellow wire
+#define DT 15  // white wire
 bool swPress = false;
 bool enIncrement = false;
 bool enDecrement = false;
@@ -95,25 +92,30 @@ CRGB menuColour = CRGB::White;
 
 
 // RTOS
-#define STACK_SIZE 2*4096
+#define STACK_SIZE 2 * 4096
 TaskHandle_t processtask;
 TaskHandle_t computer;
 QueueHandle_t queue;
 
-typedef enum{
+typedef enum
+{
   READY_TO_PROCESS
-}Queue_Message_t;
+} Queue_Message_t;
 
 #define I2S_WS 18
 #define I2S_SCK 33
 #define I2S_SD 34
 
+Mic_Settings_t mic_settings = {
+  .ws = I2S_WS,
+  .sck = I2S_SCK,
+  .sd = I2S_SD,
+  .sample_rate = SAMPLE_FREQ,
+  .sample_count = SAMPLES};
 
-
-Microphone mic;
+Microphone mic = Microphone(mic_settings);
 
 sampletype_t samples[SAMPLES];
-
 
 #include "utilities.h"
 #include "1_compute.h"

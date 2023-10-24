@@ -70,7 +70,6 @@ void setup()
   mic_settings.sample_rate = SAMPLE_FREQ;
   mic_settings.sample_count = SAMPLES;
 
-  mic.begin(mic_settings);
 
   pinMode(CLK, INPUT);
   pinMode(SW, INPUT);

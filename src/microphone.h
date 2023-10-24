@@ -14,6 +14,7 @@ This header includes everything needed to install and run an i2s microphone
 #define BITS_PER_SAMPLE I2S_BITS_PER_SAMPLE_16BIT
 #define BYTES_PER_SAMPLE (BITS_PER_SAMPLE / 8)
 #define BYTES_PER_DMA_BUFFER (SAMPLES_PER_DMA_BUFFER * BYTES_PER_SAMPLE)
+#define I2S_PORT I2S_NUM_0
 
 typedef int16_t sampletype_t;
 
@@ -22,9 +23,8 @@ typedef struct
     int ws;
     int sck;
     int sd;
-    uint32_t sample_rate;
+    unsigned int sample_rate;
     int sample_count;
-    i2s_port_t I2S_PORT = I2S_NUM_0;
 
 } Mic_Settings_t;
 
@@ -35,7 +35,7 @@ private:
     int dma_buffer_count;
 
 public:
-    void begin(Mic_Settings_t);
+    Microphone(Mic_Settings_t);
     void getBuffer(sampletype_t *);
     uint32_t getSampleRate();
     void setSampleRate(uint32_t);
