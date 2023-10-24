@@ -16,7 +16,7 @@ This header includes everything needed to install and run an i2s microphone
 #define BYTES_PER_DMA_BUFFER (SAMPLES_PER_DMA_BUFFER * BYTES_PER_SAMPLE)
 #define I2S_PORT I2S_NUM_0
 
-typedef int16_t sampletype_t;
+typedef short sampletype_t;
 
 typedef struct
 {

@@ -15,6 +15,14 @@
 
 #include "microphone.h"
 #include "process.h"
+#include "ComputeFFT.h"
+
+#define SAMPLES 1024
+#define SAMPLE_FREQ 31250 // 25140.0f
+
+#define I2S_WS 18
+#define I2S_SCK 33
+#define I2S_SD 34
 
 // LED Matrix
 #define FASTLED_INTERNAL
@@ -34,31 +42,38 @@ int title[NUM_LED];
 #define TWOPI 6.28318530718
 #define ONEPI 3.14159265358
 
-// FFT
-#include <arduinoFFT.h>
-#define SAMPLES 1024
-#define SAMPLE_FREQ 31250 // 25140.0f
+// Microphone
+sampletype_t samples[SAMPLES];
 
+Mic_Settings_t mic_settings = {
+  .ws = I2S_WS,
+  .sck = I2S_SCK,
+  .sd = I2S_SD,
+  .sample_rate = SAMPLE_FREQ,
+  .sample_count = SAMPLES};
+
+Microphone mic = Microphone(mic_settings);
+
+// FFT
 double vRe[SAMPLES];
 double vIm[SAMPLES];
-arduinoFFT FFT = arduinoFFT(vRe, vIm, SAMPLES, SAMPLE_FREQ);
-unsigned int sampling_period_us = round(1e6 / SAMPLE_FREQ);
+double win[SAMPLES];
 
-enum Windows {
-  RECTANGULAR,
-  TRIANGULAR,
-  SINE,
-  HAMMING,
-  HANNING,
-  WINDOW_COUNT
-};
+ComputeFFT_Parameters_t fftparam = {
+  .sampleCount = SAMPLES,
+  .sampleRate = SAMPLE_FREQ,
+  .real = vRe,
+  .imag = vIm,
+  .windowArray = win,
+  .window = HAMMING};
 
-float wj[WINDOW_COUNT][SAMPLES];
+ComputeFFT fft = ComputeFFT(fftparam);
+
 
 // Bands
 float bandValues[MAT_W];
 int binsPerBand[MAT_W];
-Processor_Parameters_t param = {
+Processor_Parameters_t procparam = {
     .sampleRate = SAMPLE_FREQ,
     .sampleCount = SAMPLES,
     .bandCount = MAT_W,
@@ -66,7 +81,7 @@ Processor_Parameters_t param = {
     .vRe = vRe,
     .binsPerBand = binsPerBand};
 
-Processor processor = Processor(param);
+Processor processor = Processor(procparam);
 
 // user variables
 #include "palettes.h"
@@ -89,24 +104,5 @@ typedef enum
 } Queue_Message_t;
 
 
-// Microphone
-#define I2S_WS 18
-#define I2S_SCK 33
-#define I2S_SD 34
-
-sampletype_t samples[SAMPLES];
-
-Mic_Settings_t mic_settings = {
-  .ws = I2S_WS,
-  .sck = I2S_SCK,
-  .sd = I2S_SD,
-  .sample_rate = SAMPLE_FREQ,
-  .sample_count = SAMPLES};
-
-Microphone mic = Microphone(mic_settings);
-
-
-
 #include "utilities.h"
-#include "1_compute.h"
 #include "3_display.h"
