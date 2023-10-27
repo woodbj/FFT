@@ -1,5 +1,15 @@
 #include "header.h"
 
+void swISR()
+{
+  enc.setSwitch();
+}
+
+void dialISR()
+{
+  enc.setDial();
+}
+
 void Compute(void *)
 {
   Queue_Message_t message = READY_TO_PROCESS;
@@ -16,12 +26,15 @@ void ProcessTask(void *)
 {
   Queue_Message_t message;
   unsigned long tStart;
+  attachInterrupt(ENC_SW, swISR, RISING);
+  attachInterrupt(ENC_CLK, dialISR, CHANGE);
   for (;;)
   {
     if (xQueueReceive(queue, &message, portMAX_DELAY) == pdTRUE && message == READY_TO_PROCESS)
     {
       processor.go();
       matrix.go();
+      Serial.printf("\n%d\t%d", enc.getDial(), enc.getSwitch());
     }
   }
 }

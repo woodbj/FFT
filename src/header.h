@@ -69,6 +69,10 @@ Matrix_Parameters_t matparam = {
 
 Matrix matrix = Matrix(matparam);
 
+// Encoder
+#include "Encoder.h"
+Encoder enc = Encoder(ENC_CLK, ENC_DT, ENC_SW);
+
 // RTOS
 #define STACK_SIZE 2 * 4096
 TaskHandle_t processtask;
@@ -77,9 +81,7 @@ QueueHandle_t queue;
 
 typedef enum
 {
-  READY_TO_PROCESS
+    READY_TO_PROCESS
 } Queue_Message_t;
-
-
 
 #endif

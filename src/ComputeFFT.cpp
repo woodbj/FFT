@@ -3,15 +3,14 @@
 ComputeFFT::ComputeFFT(ComputeFFT_Parameters_t _parameters)
 {
     parameters = _parameters;
+    
     FFT = arduinoFFT(
         parameters.real,
         parameters.imag,
         parameters.sampleCount,
         parameters.sampleRate);
 
-    setWindow(parameters.window);
-
-    
+    setWindow(parameters.window); 
 }
 
 void ComputeFFT::go(short *input)
@@ -35,7 +34,6 @@ void ComputeFFT::prepareInput(short * input)
         parameters.real[i] = input[i];
         parameters.imag[i] = 0;
     }
-    
 }
 
 void ComputeFFT::getMagnitude()
