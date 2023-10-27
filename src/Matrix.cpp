@@ -2,18 +2,29 @@
 
 Matrix::Matrix(Matrix_Parameters_t _parameters)
 {
-    parameters = _parameters;
-    parameters.width = parameters.xTileCount * parameters.xLEDSPerTile;
-    parameters.height = parameters.xTileCount * parameters.xLEDSPerTile;
-    parameters.ledCount = parameters.width * parameters.height;
+  parameters = _parameters;
+  parameters.width = parameters.xTileCount * parameters.xLEDSPerTile;
+  parameters.height = parameters.xTileCount * parameters.xLEDSPerTile;
+  parameters.ledCount = parameters.width * parameters.height;
 
-    FastLED.addLeds<LED_TYPE, LED_PIN, GRB>(leds, NUM_LED);
-    FastLED.setMaxPowerInVoltsAndMilliamps(5, 1000);
-    FastLED.setBrightness(100);
+  FastLED.addLeds<LED_TYPE, LED_PIN, GRB>(leds, NUM_LED);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 1000);
+  FastLED.setBrightness(100);
+}
+
+float Matrix::mapF(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 int Matrix::pindex(int x, int y)
 {
+
+  /*
+    Top left is (0,0)
+    x increases left to right
+    y increases top to bottom
+  */
   if (y % 2 == 0)
   {
     return parameters.width * y + (parameters.width - x - 1);
@@ -24,10 +35,10 @@ int Matrix::pindex(int x, int y)
   }
 }
 
-void Matrix::pushSpectLayer()
+void Matrix::buildSpectLayer()
 {
+
   float fColourIndex;
-  int colourIndex;
   float hue;
   float sat = 1;
   float lum = 1;
@@ -36,7 +47,7 @@ void Matrix::pushSpectLayer()
   static int counter = 0;
 
   // scroll old values
-  for (int step = parameters.height - 1; step > 0; step--)
+  for (int step = parameters.width - 1; step > 0; step--)
   {
     for (int band = 0; band < parameters.width; band++)
     {
@@ -47,18 +58,45 @@ void Matrix::pushSpectLayer()
   // calculate new values
   for (int band = 0; band < parameters.width; band++)
   {
-    fColourIndex = constrain(parameters.bandValues[band], 0, 1);
-    hue = 240 - 240 * fColourIndex;
-    colourIndex = round(255 * fColourIndex);
-    HSLtoRGB(hue, 1, 0.5);
+    // build hsl and rgb values based on the mode
+    fColourIndex = parameters.bandValues[band];
+    switch (mode)
+    {
+    case SPECTROGRAM:
+      hue = mapF(fColourIndex, 0, 1, 240, 0);
+      lum = 0.5;
+      break;
 
-    spect[pindex(band, 0)].setRGB(r, g, b);
-  }
+    case COLOUR_BC:
+      lum = 0.5 * fColourIndex;
+      break;
 
-  // push to matrix
-  for (int led = 0; led < parameters.ledCount; led++)
-  {
-    leds[led] = spect[led];
+    case COLOUR_BCW:
+      lum = 1 * fColourIndex;
+      break;
+
+    case RAINBOW_BC:
+      hue = rbow;
+      lum = 0.5 * fColourIndex;
+      break;
+
+    case RAINBOW_BCW:
+      hue = rbow;
+      lum = 1 * fColourIndex;
+      break;
+    }
+
+    HSLtoRGB(hue, sat, lum);
+    spect[pindex(band, 0)] = CRGB(r, g, b);
+
+    // prepare the iterator for the next rainbow hue
+    counter++;
+    if (counter % (5 + 1) == 0)
+    {
+      rbow++;
+      if (rbow >= 360)
+        rbow = 0;
+    }
   }
 }
 
@@ -111,8 +149,103 @@ void Matrix::HSLtoRGB(int h, float s, float l)
   b = (int)((bTemp + m) * 255);
 }
 
+void Matrix::setMode(int dir)
+{
+  int currentMode = mode;
+  currentMode += dir;
+  if (currentMode < 0)
+    currentMode = 0;
+  else if (currentMode >= LAST_STYLE)
+    currentMode = LAST_STYLE - 1;
+  mode = currentMode;
+}
+
+void Matrix::clearMenu()
+{
+  for (int i = 0; i < NUM_LED; i++){
+    menu[i] = CRGB::Black;
+  }
+}
+
+void Matrix::drawString(char *string, int xpos, int ypos)
+{
+
+  int letterVal;
+  int bitIndex;
+  int pixel;
+  int letterWidth;
+
+  int sx = xpos;
+  int sy = ypos;
+
+  int absx;
+  int absy;
+
+  CRGB pixCol;
+
+  for (int i = 0; i < MAX_CHAR_LEN; i++)
+  {
+    if (string[i] == 0)
+      break;
+    bitIndex = 0;
+    letterWidth = 0;
+    letterVal = letterBits[string[i] - 'A'];
+    Serial.printf("\n%d\n", string[i] - 'A');
+    for (int ly = 0; ly < LETTER_HEIGHT; ly++)
+    {
+      for (int lx = 0; lx < LETTER_WIDTH; lx++)
+      {
+        absx = sx + lx;
+        absy = sy + ly;
+        if (absx >= parameters.width || absy >= parameters.height)
+        { // skip this pixel if outside the matrix boundaries
+          bitIndex++;
+          continue;
+        }
+
+        // get the pixel value
+        pixel = (letterVal >> bitIndex) & 0b1;
+
+        if (pixel)
+        { // if pixel index value is a 1, draw it
+          pixCol = menuColour;
+
+          if (lx > letterWidth)
+          { // track the width of the letter
+            letterWidth = lx;
+          }
+        }
+        else
+        { // if not, draw in a black pixel
+          pixCol = CRGB::Black;
+        }
+
+        menu[pindex(absx, absy)] = pixCol;
+
+        bitIndex++;
+      }
+    }
+    sx += letterWidth + 2;
+  }
+
+  lastMenuDrawTime = millis();
+}
+
+void Matrix::mergeLayers()
+{
+  for (int i = 0; i < NUM_LED; i++)
+  {
+    leds[i] = spect[i];
+    if (millis() - lastMenuDrawTime < menuDwell_ms && menu[i] != CRGB::Black)
+    {
+      leds[i] = menu[i];
+    }
+  }
+}
+
 void Matrix::go()
 {
-    pushSpectLayer();
-    FastLED.show();
+  buildSpectLayer();
+  mergeLayers();
+  FastLED.show();
 }

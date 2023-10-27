@@ -1,35 +1,17 @@
 void changeStyle()
 {
-    if (gEncoderState.navigating)
-    {
-        Serial.printf("\nchangeStyle selected");
-    }
-    else
-    {
-        Serial.printf("\nchangeStyle: %d", gEncoderState.delta);
-    }
-}
 
-void changeLoudness()
-{
+    char title[5];
+    strcpy(title, "STYL");
     if (gEncoderState.navigating)
     {
-        Serial.printf("\nchangeLoudness selected");
+        matrix.clearMenu();
+        matrix.drawString(title, 0, 0);
     }
     else
     {
-        Serial.printf("\nchangeLoudness: %d", gEncoderState.delta);
-    }
-}
-
-void changex()
-{
-    if (gEncoderState.navigating)
-    {
-        Serial.printf("\nchangex selected");
-    }
-    else
-    {
-        Serial.printf("\nchangex: %d", gEncoderState.delta);
+        int dir = constrain(gEncoderState.delta, -1, 1);
+        matrix.drawString(title, 0, 11);
+        matrix.setMode(dir);
     }
 }

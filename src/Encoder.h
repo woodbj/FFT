@@ -8,18 +8,19 @@ typedef struct
     int delta;
     int click;
     int changed;
-    bool navigating = true;
+    bool navigating;
 } Encoder_State_t;
 
 class Encoder
 {
-public:
+private:
     int clkpin;
     int dtpin;
     int swpin;
     unsigned long debounce_ms = 0;
-
     Encoder_State_t es;
+
+public:
     Encoder(int, int, int);
     void setDial();
     void setSwitch();

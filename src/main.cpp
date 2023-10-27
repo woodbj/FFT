@@ -44,9 +44,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  menu.add(changeLoudness);
   menu.add(changeStyle);
-  menu.add(changex);
 
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));
