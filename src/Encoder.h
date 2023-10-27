@@ -8,6 +8,7 @@ typedef struct
     int delta;
     int click;
     int changed;
+    bool navigating = true;
 } Encoder_State_t;
 
 class Encoder
@@ -22,8 +23,6 @@ public:
     Encoder(int, int, int);
     void setDial();
     void setSwitch();
-    void setDelta(int);
-    int getDial();
-    int getSwitch();
+    Encoder_State_t getState();
 };
 #endif

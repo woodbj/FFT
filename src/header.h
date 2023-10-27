@@ -71,7 +71,13 @@ Matrix matrix = Matrix(matparam);
 
 // Encoder
 #include "Encoder.h"
+Encoder_State_t gEncoderState;
 Encoder enc = Encoder(ENC_CLK, ENC_DT, ENC_SW);
+
+// Menu
+#include "MenuManager.h"
+#include "menuFunctions.h"
+MenuManager menu;
 
 // RTOS
 #define STACK_SIZE 2 * 4096

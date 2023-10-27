@@ -34,7 +34,8 @@ void ProcessTask(void *)
     {
       processor.go();
       matrix.go();
-      Serial.printf("\n%d\t%d", enc.getDial(), enc.getSwitch());
+      gEncoderState = enc.getState();
+      menu.navigate(gEncoderState);
     }
   }
 }
@@ -42,6 +43,11 @@ void ProcessTask(void *)
 void setup()
 {
   Serial.begin(115200);
+
+  menu.add(changeLoudness);
+  menu.add(changeStyle);
+  menu.add(changex);
+
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));
 

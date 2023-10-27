@@ -32,26 +32,20 @@ void Encoder::setDial()
     }
 }
 
-void Encoder::setDelta(int change)
-{
-    es.delta += change;
-}
-
 void Encoder::setSwitch()
 {
     es.click = es.click + 1;
+    es.changed = true;
+    es.navigating = !es.navigating;
 }
 
-int Encoder::getDial()
+Encoder_State_t Encoder::getState()
 {
-    int value = es.delta;
-    es.delta = 0;
-    return value;
-}
+    Encoder_State_t oldState = es;
 
-int Encoder::getSwitch()
-{
-    int value = es.click;
+    es.changed = false;
     es.click = 0;
-    return value;
+    es.delta = 0;
+
+    return oldState;
 }
