@@ -20,12 +20,15 @@ class Processor
 private:
     Processor_Parameters_t parameters;
     int firstBin;
+    float gain = 1;
 
 public:
     Processor(Processor_Parameters_t p);
+    void setSampleRate(int);
     void binsToBands();
     float freqToNote(float f) { return 12 * log2f(f / 16.3515978312874); }
     float noteToFreq(float n) { return 16.3515978312874 * powf(2, n / 12.0); }
+    double incrementGain(int);
     void buildBins();
     void scale();
     void yAxis();

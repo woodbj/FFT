@@ -35,6 +35,7 @@ class ComputeFFT{
     public:
     ComputeFFT(ComputeFFT_Parameters_t);
     void go(short *);
+
     void setWindow(enum Windows);
     void applyWindow();
     void prepareInput(short*);

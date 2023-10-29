@@ -68,10 +68,12 @@ void Matrix::buildSpectLayer()
       break;
 
     case COLOUR_BC:
+      hue = colourMode;
       lum = 0.5 * fColourIndex;
       break;
 
     case COLOUR_BCW:
+      hue = colourMode;
       lum = 1 * fColourIndex;
       break;
 
@@ -91,7 +93,7 @@ void Matrix::buildSpectLayer()
 
     // prepare the iterator for the next rainbow hue
     counter++;
-    if (counter % (5 + 1) == 0)
+    if (counter % (rainbowRate + 1) == 0)
     {
       rbow++;
       if (rbow >= 360)
@@ -149,7 +151,7 @@ void Matrix::HSLtoRGB(int h, float s, float l)
   b = (int)((bTemp + m) * 255);
 }
 
-void Matrix::setMode(int dir)
+void Matrix::scrollMode(int dir)
 {
   int currentMode = mode;
   currentMode += dir;
@@ -160,16 +162,71 @@ void Matrix::setMode(int dir)
   mode = currentMode;
 }
 
+int Matrix::getCurrentMode()
+{
+  return mode;
+}
+
+int Matrix::incrementColour(int dir)
+{
+  colourMode += dir;
+  if (colourMode < 0)
+    colourMode += 360;
+  colourMode %= 360;
+  return colourMode;
+}
+
+int Matrix::incrementRainbowRate(int dir)
+{
+  int min = 0;
+  int max = 20;
+  rainbowRate += dir;
+  if (rainbowRate < min)
+    rainbowRate = min;
+  if (rainbowRate > max)
+    rainbowRate = max;
+  return rainbowRate;
+}
+
+void Matrix::getModeString(char *str)
+{
+  switch (mode)
+  {
+  case SPECTROGRAM:
+    strcpy(str, "SPEC");
+    break;
+  case COLOUR_BC:
+    strcpy(str, "col1");
+    break;
+  case COLOUR_BCW:
+    strcpy(str, "col2");
+    break;
+  case RAINBOW_BC:
+    strcpy(str, "rb1");
+    break;
+  case RAINBOW_BCW:
+    strcpy(str, "rb2");
+    break;
+  default:
+    break;
+  }
+}
+
+void Matrix::setMenuColour(CRGB newCol)
+{
+  menuColour = newCol;
+}
+
 void Matrix::clearMenu()
 {
-  for (int i = 0; i < NUM_LED; i++){
+  for (int i = 0; i < NUM_LED; i++)
+  {
     menu[i] = CRGB::Black;
   }
 }
 
 void Matrix::drawString(char *string, int xpos, int ypos)
 {
-
   int letterVal;
   int bitIndex;
   int pixel;
@@ -186,11 +243,18 @@ void Matrix::drawString(char *string, int xpos, int ypos)
   for (int i = 0; i < MAX_CHAR_LEN; i++)
   {
     if (string[i] == 0)
+    { // terminate the loop if at the null character at the end of the string
       break;
+    }
     bitIndex = 0;
     letterWidth = 0;
-    letterVal = letterBits[string[i] - 'A'];
-    Serial.printf("\n%d\n", string[i] - 'A');
+    letterVal = asciiFont[string[i]];
+
+    if (letterVal == 0)
+    { // skip the character if there is not font identified for it
+      continue;
+    }
+
     for (int ly = 0; ly < LETTER_HEIGHT; ly++)
     {
       for (int lx = 0; lx < LETTER_WIDTH; lx++)
@@ -228,7 +292,71 @@ void Matrix::drawString(char *string, int xpos, int ypos)
     sx += letterWidth + 2;
   }
 
+  // return sx;
+
   lastMenuDrawTime = millis();
+}
+
+void Matrix::drawDecimal(float input, int xpos, int ypos, int sigfig)
+{
+  // convert float to string
+  char str[MAX_CHAR_LEN];
+
+  int sign = abs(input) / input;
+  input = abs(input);
+  int order = log10(input) + 1;
+  input /= pow(10, order - 1);
+
+  int index = 0;
+
+  int iterations = sigfig;
+  if (order > sigfig)
+  {
+    iterations = order;
+  }
+
+  for (int i = 0; i < MAX_CHAR_LEN; i++)
+  { // zero out the string
+    str[i] = 0;
+  }
+
+  if (sign < 0)
+  { // add a negative sign if neccessary
+    str[index] = '-';
+    index++;
+  }
+
+  // if (order < 1)
+  // { // add leading zero if needed
+  //   str[index] = '0';
+  //   index++;
+  // }
+
+  if (order < 1 && iterations > 1)
+  { // add decimal point after leading zero if needed
+    str[index] = '.';
+    index++;
+  }
+
+  double num = input;
+  int digit;
+  for (int i = 0; i < iterations; i++)
+  {
+    digit = num; // conversion from double to int will cut decimals
+    str[index] = digit + '0';
+
+    if (order == 1 && i < iterations - 1)
+    { // add decimal. Ignore if on the last iteration
+      index++;
+      str[index] = '.';
+    }
+
+    order--;
+    index++;
+    num = (num - digit) * 10;
+  }
+
+  drawString(str, xpos, ypos);
 }
 
 void Matrix::mergeLayers()
@@ -236,9 +364,20 @@ void Matrix::mergeLayers()
   for (int i = 0; i < NUM_LED; i++)
   {
     leds[i] = spect[i];
-    if (millis() - lastMenuDrawTime < menuDwell_ms && menu[i] != CRGB::Black)
+    if (millis() - lastMenuDrawTime < menuDwell_ms)
     {
-      leds[i] = menu[i];
+      if (menu[i] != CRGB::Black)
+      {
+        leds[i] = menu[i];
+      }
+      else
+      {
+        float dim = 0.25;
+        int r = dim * leds[i].red;
+        int g = dim * leds[i].green;
+        int b = dim * leds[i].blue;
+        leds[i].setRGB(r, g, b);
+      }
     }
   }
 }

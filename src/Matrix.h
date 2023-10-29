@@ -8,10 +8,14 @@
 #define FASTLED_INTERNAL
 #include <FastLED.h>
 
+#include <math.h>
+
 
 #define LED_TYPE WS2812B
 
 #define MAX_CHAR_LEN 10
+#define BOTTOM_LINE 11
+#define TOP_LINE 0
 typedef enum
 {
     SPECTROGRAM,
@@ -44,7 +48,9 @@ private:
     CRGB menu[NUM_LED];
     int mode = SPECTROGRAM;
     unsigned long menuDwell_ms = 2000;
-    unsigned long lastMenuDrawTime;
+    unsigned long lastMenuDrawTime = millis() - menuDwell_ms;
+    int rainbowRate = 5;
+    int colourMode = 0;
 
     float h, s, l;
     int r, g, b;
@@ -55,9 +61,15 @@ public:
     int pindex(int, int);
     void buildSpectLayer();
     void HSLtoRGB(int, float, float);
-    void setMode(int dir);
+    void scrollMode(int dir);
+    int getCurrentMode();
+    int incrementColour(int);
+    int incrementRainbowRate(int);
+    void getModeString(char*);
+    void setMenuColour(CRGB);
     void clearMenu();
     void drawString(char*, int, int);
+    void drawDecimal(float, int, int, int);
     void mergeLayers();
     void go();
 };

@@ -31,7 +31,7 @@ void Processor::scale()
   for (int band = 0; band < parameters.bandCount; band++)
   {
     val = parameters.bandValues[band];
-    val = powf(val, 1); // add non-linearity to the response
+    val = powf(val, gain); // add non-linearity to the response
     val *= vol;              // scale
     if (val > 1.0)
       val = 1.0; // set peak value at 1
@@ -55,6 +55,11 @@ Processor::Processor(Processor_Parameters_t p)
 {
     parameters = p;
     buildBins();
+}
+
+void Processor::setSampleRate(int newSampleRate)
+{
+  parameters.sampleRate = newSampleRate;
 }
 
 void Processor::binsToBands()
@@ -84,7 +89,18 @@ void Processor::binsToBands()
   }
 }
 
+double Processor::incrementGain(int dir)
+{
+  double min = 0.5;
+  double max = 1.5;
+  double step = 0.01 * dir;
 
+  gain += step;
+  if(gain < min) gain = min;
+  if(gain > max) gain = max;
+
+  return gain;
+}
 
 void Processor::buildBins()
 { // can count beyond samples/2 so needs some fixing
