@@ -48,6 +48,7 @@ void setup()
   menu.add(changeStyleParameter);
   menu.add(changeGain);
   menu.add(changeSampleRate);
+  
 
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));

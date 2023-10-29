@@ -17,7 +17,8 @@ public:
     {
         if (size < MENU_COUNT_MAX)
         {
-            functionList[size++] = func;
+            functionList[size] = func;
+            size++;
         }
         else
         {

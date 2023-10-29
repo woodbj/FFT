@@ -11,8 +11,13 @@
 Microphone::Microphone(Mic_Settings_t _settings)
 {
     settings = _settings;
+    micInstall();
 
-    // samplePeriod_us = 1e6 / (1.0f * settings.sample_rate);
+}
+
+void Microphone::micInstall()
+{
+       // samplePeriod_us = 1e6 / (1.0f * settings.sample_rate);
     // bufferPeriod_us = samplePeriod_us * SAMPLES_PER_DMA_BUFFER;
     dma_buffer_count = 2 + settings.sample_count / SAMPLES_PER_DMA_BUFFER;
 
@@ -35,6 +40,7 @@ Microphone::Microphone(Mic_Settings_t _settings)
 
     i2s_driver_install(I2S_PORT, &i2s_config, 0, NULL);
     i2s_set_pin(I2S_PORT, &pin_config);
+
 }
 
 /**
@@ -78,11 +84,14 @@ void Microphone::getBuffer(sampletype_t *input)
     delay(1);
 }
 
-uint32_t Microphone::getSampleRate()
+unsigned int Microphone::getSampleRate()
 {
     return settings.sample_rate;
 }
 
 void Microphone::setSampleRate(uint32_t rate)
 {
+    settings.sample_rate = rate;
+    i2s_driver_uninstall(I2S_PORT);
+    micInstall();
 }

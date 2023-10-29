@@ -60,6 +60,7 @@ Processor::Processor(Processor_Parameters_t p)
 void Processor::setSampleRate(int newSampleRate)
 {
   parameters.sampleRate = newSampleRate;
+  buildBins();
 }
 
 void Processor::binsToBands()

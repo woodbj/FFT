@@ -46,6 +46,11 @@ void ComputeFFT::getMagnitude()
     }
 }
 
+void ComputeFFT::setSampleRate(int newRate)
+{
+    parameters.sampleRate = newRate;
+}
+
 void ComputeFFT::setWindow(enum Windows window)
 {
     currentWindow = window;

@@ -13,7 +13,7 @@ Encoder::Encoder(int clockPin, int dataPin, int switchPin)
     es.delta = 0;
     es.click = 0;
     es.changed = false;
-    es.navigating = false;
+    es.navigating = true;
 }
 
 void Encoder::setDial()

@@ -40,6 +40,7 @@ class ComputeFFT{
     void applyWindow();
     void prepareInput(short*);
     void getMagnitude();
+    void setSampleRate(int);
 
 };
 

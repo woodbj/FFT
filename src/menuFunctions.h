@@ -148,32 +148,48 @@ void changeGain()
     }
 }
 
-void applyNewSampleRate()
+double adjustSampleRate(int dir)
 {
-    
+    int min = 10000;
+    int max = 44100;
+    double sr = (int)mic.getSampleRate();
+    int step = 500;
+    sr += dir * step;
+
+    if(sr > max) sr = max;
+    if(sr < min) sr = min;
+
+    mic.setSampleRate((uint32_t)sr);
+    processor.setSampleRate((int)sr);
+    fft.setSampleRate((int)sr);
+
+    Serial.printf("\nSample Rate %fHz", sr);
+
+    return sr / 1000;
 }
 
 void changeSampleRate()
 {
-    char title1[6];
-    char title2[6];
-    strcpy(title1, "SPL");
-    strcpy(title2, "RATE");
+    char title[6];
+    strcpy(title, "SRAT");
+
 
     if (gEncoderState.navigating)
     {
         matrix.clearMenu();
         matrix.setMenuColour(editCol);
-        matrix.drawString(title1, 0, TOP_LINE);
-        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.drawString(title, 0, TOP_LINE);
         matrix.setMenuColour(viewCol);
+        matrix.drawDecimal(adjustSampleRate(0), 0, BOTTOM_LINE, 3);
     }
     else
     {
         matrix.clearMenu();
         matrix.setMenuColour(viewCol);
-        matrix.drawString(title1, 0, TOP_LINE);
-        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.drawString(title, 0, TOP_LINE);
         matrix.setMenuColour(editCol);
+        matrix.drawDecimal(0, 0, BOTTOM_LINE, 0);
+        matrix.drawDecimal(adjustSampleRate(gEncoderState.delta), 0, BOTTOM_LINE, 3);
     }
+
 }

@@ -8,7 +8,7 @@
 #include "utilities.h"
 
 #define SAMPLES 1024
-#define SAMPLE_FREQ 31250 // 25140.0f
+#define SAMPLE_FREQ 30000 // 25140.0f
 
 // Microphone
 #include "microphone.h"

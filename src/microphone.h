@@ -36,8 +36,9 @@ private:
 
 public:
     Microphone(Mic_Settings_t);
+    void micInstall();
     void getBuffer(sampletype_t *);
-    uint32_t getSampleRate();
+    unsigned int getSampleRate();
     void setSampleRate(uint32_t);
 };
 
