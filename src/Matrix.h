@@ -47,7 +47,7 @@ private:
     CRGB spect[NUM_LED]; // spectrogram values
     CRGB menu[NUM_LED];
     int mode = SPECTROGRAM;
-    unsigned long menuDwell_ms = 2000;
+    unsigned long menuDwell_ms = 1500;
     unsigned long lastMenuDrawTime = millis() - menuDwell_ms;
     int rainbowRate = 5;
     int colourMode = 0;
@@ -69,7 +69,6 @@ public:
     void setMenuColour(CRGB);
     void clearMenu();
     void drawString(char*, int, int);
-    void drawDecimal(float, int, int, int);
     void mergeLayers();
     void go();
 };

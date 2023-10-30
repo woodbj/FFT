@@ -15,7 +15,7 @@ void Compute(void *)
   Queue_Message_t message = READY_TO_PROCESS;
   for (;;)
   {
-    capFPS(25);
+    capFPS(fpsRequested);
     mic.getBuffer(samples);
     fft.go(samples);
     xQueueSend(queue, &message, portMAX_DELAY);
@@ -48,6 +48,7 @@ void setup()
   menu.add(changeStyleParameter);
   menu.add(changeGain);
   menu.add(changeSampleRate);
+  menu.add(changeFPS);
   
 
 

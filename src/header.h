@@ -58,6 +58,8 @@ Processor processor = Processor(procparam);
 #define FASTLED_INTERNAL
 #include <FastLED.h>
 
+int fpsRequested = 25;
+
 Matrix_Parameters_t matparam = {
     .ledPin = LED_PIN,
     .xTileCount = X_TILES,

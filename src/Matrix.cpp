@@ -297,68 +297,6 @@ void Matrix::drawString(char *string, int xpos, int ypos)
   lastMenuDrawTime = millis();
 }
 
-void Matrix::drawDecimal(float input, int xpos, int ypos, int sigfig)
-{
-  // convert float to string
-  char str[MAX_CHAR_LEN];
-
-  int sign = abs(input) / input;
-  input = abs(input);
-  int order = log10(input) + 1;
-  input /= pow(10, order - 1);
-
-  int index = 0;
-
-  int iterations = sigfig;
-  if (order > sigfig)
-  {
-    iterations = order;
-  }
-
-  for (int i = 0; i < MAX_CHAR_LEN; i++)
-  { // zero out the string
-    str[i] = 0;
-  }
-
-  if (sign < 0)
-  { // add a negative sign if neccessary
-    str[index] = '-';
-    index++;
-  }
-
-  // if (order < 1)
-  // { // add leading zero if needed
-  //   str[index] = '0';
-  //   index++;
-  // }
-
-  if (order < 1 && iterations > 1)
-  { // add decimal point after leading zero if needed
-    str[index] = '.';
-    index++;
-  }
-
-  double num = input;
-  int digit;
-  for (int i = 0; i < iterations; i++)
-  {
-    digit = num; // conversion from double to int will cut decimals
-    str[index] = digit + '0';
-
-    if (order == 1 && i < iterations - 1)
-    { // add decimal. Ignore if on the last iteration
-      index++;
-      str[index] = '.';
-    }
-
-    order--;
-    index++;
-    num = (num - digit) * 10;
-  }
-
-  drawString(str, xpos, ypos);
-}
-
 void Matrix::mergeLayers()
 {
   for (int i = 0; i < NUM_LED; i++)
