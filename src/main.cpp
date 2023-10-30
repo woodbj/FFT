@@ -48,9 +48,11 @@ void setup()
   menu.add(changeStyleParameter);
   menu.add(changeGain);
   menu.add(changeSampleRate);
+  menu.add(changeLoVol);
+  menu.add(changeHiVol);
+  menu.add(changeVolPeak);
   menu.add(changeFPS);
   
-
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));
 

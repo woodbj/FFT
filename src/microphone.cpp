@@ -12,7 +12,6 @@ Microphone::Microphone(Mic_Settings_t _settings)
 {
     settings = _settings;
     micInstall();
-
 }
 
 void Microphone::micInstall()

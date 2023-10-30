@@ -1,8 +1,6 @@
 #include <process.h>
 #include <Arduino.h>
 
-
-
 void Processor::yAxis()
 {
   float res = parameters.sampleRate / (1.0f * parameters.sampleCount);
@@ -10,11 +8,10 @@ void Processor::yAxis()
 
   for (int i = 1; i <= parameters.sampleCount / 2; i++)
   {
-
-      binf = i * res;
-      if (parameters.vRe[i] < 0)
-        parameters.vRe[i] = 0;
-      parameters.vRe[i] = 1.25 * parameters.vRe[i] / sqrt(binf);
+    binf = i * res;
+    if (parameters.vRe[i] < 0)
+      parameters.vRe[i] = 0;
+    parameters.vRe[i] = 1.25 * parameters.vRe[i] / sqrt(binf);
   }
 }
 
@@ -23,16 +20,14 @@ void Processor::scale()
   // Scale the bandValues
   float val;
   int counter = 0;
-  static float vol = 1;
+  static float vol = volFloor;
   float volDelta = 0.01;
-  int loThreshold = 1;
-  int hiThreshold = 6;
 
   for (int band = 0; band < parameters.bandCount; band++)
   {
     val = parameters.bandValues[band];
     val = powf(val, gain); // add non-linearity to the response
-    val *= vol;              // scale
+    val *= vol;            // scale
     if (val > 1.0)
       val = 1.0; // set peak value at 1
     parameters.bandValues[band] = val;
@@ -48,13 +43,13 @@ void Processor::scale()
   {
     vol += (loThreshold - counter) * volDelta;
   }
-  vol = constrain(vol, 0.2, 7);
+  vol = constrain(vol, volFloor, volPeak);
 }
 
 Processor::Processor(Processor_Parameters_t p)
 {
-    parameters = p;
-    buildBins();
+  parameters = p;
+  buildBins();
 }
 
 void Processor::setSampleRate(int newSampleRate)
@@ -97,10 +92,35 @@ double Processor::incrementGain(int dir)
   double step = 0.01 * dir;
 
   gain += step;
-  if(gain < min) gain = min;
-  if(gain > max) gain = max;
+  if (gain < min)
+    gain = min;
+  if (gain > max)
+    gain = max;
 
   return gain;
+}
+
+int Processor::incrementLoThreshold(int dir)
+{
+  loThreshold += dir;
+  loThreshold = constrain(loThreshold, 0, hiThreshold);
+  return loThreshold;
+}
+
+int Processor::incrementHiThreshold(int dir)
+{
+  hiThreshold += dir;
+  hiThreshold = constrain(hiThreshold, loThreshold, parameters.bandCount);
+  return hiThreshold;
+}
+
+float Processor::incrementVolPeak(int dir)
+{
+  float step = 0.05;
+  volPeak += step * dir;
+  if (volPeak < volFloor)
+    volPeak = volFloor;
+  return volPeak;
 }
 
 void Processor::buildBins()

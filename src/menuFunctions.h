@@ -31,26 +31,6 @@ void changeStyle()
     }
 }
 
-void spectrogramMode()
-{
-    char title[6];
-    strcpy(title, "PALT");
-    
-
-    if (gEncoderState.navigating)
-    {
-        matrix.clearMenu();
-        matrix.setMenuColour(editCol);
-        matrix.drawString(title, 0, TOP_LINE);
-    }
-    else
-    {
-        matrix.clearMenu();
-        matrix.setMenuColour(viewCol);
-        matrix.drawString(title, 0, TOP_LINE);
-    }
-}
-
 void colourMode()
 {
     char title[6];
@@ -71,7 +51,7 @@ void colourMode()
         matrix.clearMenu();
         matrix.setMenuColour(viewCol);
         matrix.drawString(title, 0, TOP_LINE);
-        matrix.setMenuColour(editCol);        
+        matrix.setMenuColour(editCol);
         sprintf(val, "%d", matrix.incrementColour(gEncoderState.delta));
         matrix.drawString(val, 0, BOTTOM_LINE);
     }
@@ -124,8 +104,7 @@ void changeStyleParameter()
         break;
 
     case SPECTROGRAM:
-        // spectrogramMode();
-        menu.shift(gEncoderState.delta);
+        menu.skip(gEncoderState.delta);
         break;
 
     default:
@@ -164,7 +143,7 @@ double adjustSampleRate(int dir)
     int min = 10000;
     int max = 44100;
     double sr = (int)mic.getSampleRate();
-    int step = 500;
+    int step = 100;
     sr += dir * step;
 
     if (sr > max)
@@ -222,7 +201,7 @@ void changeFPS()
         sprintf(val1, "%d", fpsRequested);
         matrix.drawString(val1, 0, BOTTOM_LINE);
 
-        matrix.setMenuColour(viewCol);
+        matrix.setMenuColour(CRGB::Orange);
         sprintf(val2, "%d", fpsActual);
         matrix.drawString(val2, 9, BOTTOM_LINE);
     }
@@ -239,8 +218,95 @@ void changeFPS()
         sprintf(val1, "%d", fpsRequested);
         matrix.drawString(val1, 0, BOTTOM_LINE);
 
-        matrix.setMenuColour(viewCol);
+        matrix.setMenuColour(CRGB::Orange);
         sprintf(val2, "%d", fpsActual);
         matrix.drawString(val2, 9, BOTTOM_LINE);
+    }
+}
+
+void changeLoVol()
+{
+
+    char title[6] = "vol";
+    char title2[6] = "lo";
+    char val[6];
+
+    if (gEncoderState.navigating)
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.setMenuColour(viewCol);
+        sprintf(val, "%d", processor.incrementLoThreshold(0));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+    else
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(viewCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.setMenuColour(editCol);
+        sprintf(val, "%d", processor.incrementLoThreshold(gEncoderState.delta));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+}
+
+void changeHiVol()
+{
+
+    char title[6] = "vol";
+    char title2[6] = "hi";
+    char val[6];
+
+    if (gEncoderState.navigating)
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.setMenuColour(viewCol);
+        sprintf(val, "%d", processor.incrementHiThreshold(0));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+    else
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(viewCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.setMenuColour(editCol);
+        sprintf(val, "%d", processor.incrementHiThreshold(gEncoderState.delta));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+}
+
+void changeVolPeak()
+{
+
+    char title[6] = "vol";
+    char title2[6] = "peak";
+    char val[6];
+
+    if (gEncoderState.navigating)
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.setMenuColour(viewCol);
+        sprintf(val, "%.2f", processor.incrementVolPeak(0));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+    else
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(viewCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.drawString(title2, 0, TOP_LINE + 5);
+        matrix.setMenuColour(editCol);
+        sprintf(val, "%.2f", processor.incrementVolPeak(gEncoderState.delta));
+        matrix.drawString(val, 0, BOTTOM_LINE);
     }
 }
