@@ -35,6 +35,7 @@ void spectrogramMode()
 {
     char title[6];
     strcpy(title, "PALT");
+    
 
     if (gEncoderState.navigating)
     {
@@ -123,7 +124,8 @@ void changeStyleParameter()
         break;
 
     case SPECTROGRAM:
-        spectrogramMode();
+        // spectrogramMode();
+        menu.shift(gEncoderState.delta);
         break;
 
     default:
@@ -173,8 +175,6 @@ double adjustSampleRate(int dir)
     mic.setSampleRate((uint32_t)sr);
     processor.setSampleRate((int)sr);
     fft.setSampleRate((int)sr);
-
-    Serial.printf("\nSample Rate %fHz", sr);
 
     return sr / 1000;
 }
@@ -229,7 +229,7 @@ void changeFPS()
     else
     {
         fpsRequested += gEncoderState.delta;
-        fpsRequested = constrain(fpsRequested, 20, 40);
+        fpsRequested = constrain(fpsRequested, 20, 35);
 
         matrix.clearMenu();
         matrix.setMenuColour(viewCol);

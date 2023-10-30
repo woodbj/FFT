@@ -78,8 +78,8 @@ Encoder enc = Encoder(ENC_CLK, ENC_DT, ENC_SW);
 
 // Menu
 #include "MenuManager.h"
-#include "menuFunctions.h"
 MenuManager menu;
+#include "menuFunctions.h"
 
 // RTOS
 #define STACK_SIZE 2 * 4096

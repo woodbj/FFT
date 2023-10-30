@@ -55,6 +55,13 @@ public:
         }
         functionList[currentIndex]();
     };
+
+    void shift(int dir){
+        currentIndex += dir;
+        if(currentIndex >= size) currentIndex = size - 1;
+        if(currentIndex < 0) currentIndex = 0;
+        functionList[currentIndex]();
+    };
 };
 
 #endif
