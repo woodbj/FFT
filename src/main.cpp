@@ -50,7 +50,8 @@ void setup()
   menu.add(changeHiVol);
   menu.add(changeNPB);
   menu.add(changeLoNote);
-  menu.add(changeFPS);
+  menu.add(changeOSR);
+  menu.add(changeGain);
   
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));

@@ -51,41 +51,19 @@ void Processor::scale()
   Serial.printf("\t%d", delta);
 
   if (span > 8)
-  { // this means that it's not just quiet
-    // if (counter > hiThreshold)
-    // {
-    //   delta = abs(counter - hiThreshold);
-    //   volActual -= delta * volDelta;
-    // }
-    // else if (counter < loThreshold)
-    // {
-    //   delta = abs(counter - loThreshold);
-    //   volActual += delta * volDelta;
-    // }
-    // delta = (counter - hiThreshold);
-
+  { // if there's stuff playing, target the set count of max values
     volActual += (-delta) * volDelta;
-
-
-
-
-
-    Serial.printf("\t%d", 1);
-
-
-    // volActual = constrain(volActual, volFloor, volPeak);
   }
   else
-  { // if it is quiet
-    if(average > 0.05)
-    { // gradually reduce the volume
+  { // if it's quiet, target a pixel value
+    if(average > 0.1)
+    {
       volActual -= volDelta;
     }
     else
     {
       volActual += volDelta;
     }
-    Serial.printf("\t%d", 0);
   }
 
   if(volActual <= 0) volActual = volMin;
@@ -141,9 +119,9 @@ void Processor::binsToBands()
 
 double Processor::incrementGain(int dir)
 {
-  double min = 0.5;
+  double min = 1;
   double max = 10;
-  double step = 0.1 * dir;
+  double step = 1 * dir;
 
   gain += step;
   if (gain < min)
@@ -166,6 +144,16 @@ int Processor::incrementHiThreshold(int dir)
   hiThreshold += dir;
   hiThreshold = constrain(hiThreshold, loThreshold, parameters.bandCount);
   return hiThreshold;
+}
+
+float Processor::incrementOSR(int dir)
+{
+  float temp = osrMin;
+  temp += 0.1 * dir;
+  if(temp < 1) temp = 1;
+  osrMin = temp;
+  buildBins();
+  return osrMin;
 }
 
 float Processor::incrementVolPeak(int dir)
@@ -198,12 +186,13 @@ int Processor::incrementNPB(int dir)
 
 int Processor::buildBins()
 {
+  float offset = 0;
   int nMin = nFirst;
   int nMax = notesPerBand * parameters.bandCount + nMin - 1;
   float fMin = C0 * powf(2, (float)nMin / 12);
-  float fMax = C0 * powf(2, ((float)nMax + 0.5) / 12);
+  float fMax = C0 * powf(2, ((float)nMax + offset) / 12);
 
-  float bwLo = C0 * (powf(2, (nMin + 0.5) / 12) - powf(2, (nMin - 0.5) / 12));
+  float bwLo = C0 * (powf(2, (nMin + offset) / 12) - powf(2, (nMin - offset) / 12));
   float bwHi = (2 * fMax * osrMin) / parameters.sampleCount;
   float bw = bwLo;
   if (bwHi > bwLo)
@@ -213,7 +202,7 @@ int Processor::buildBins()
 
   int n1 = nMin;
   int n2;
-  float f1 = C0 * powf(2, (n1 - 0.5) / 12);
+  float f1 = C0 * powf(2, (n1 - offset) / 12);
   float f2;
   int b1 = (int)(f1 / bw);
   int b2;
@@ -225,7 +214,7 @@ int Processor::buildBins()
   for (int i = 0; i < parameters.bandCount; i++)
   {
     n2 = n1 + notesPerBand - 1;
-    f2 = C0 * powf(2, (n2 + 0.5) / 12);
+    f2 = C0 * powf(2, (n2 + offset) / 12);
     b2 = f2 / bw;
     bc = b2 - b1 + 1;
     bsum += bc;
@@ -233,7 +222,7 @@ int Processor::buildBins()
     parameters.binsPerBand[i] = bc;
 
     n1 = n2 + 1;
-    f1 = C0 * powf(2, (n1 - 0.5) / 12);
+    f1 = C0 * powf(2, (n1 - offset) / 12);
     b1 = b2 + 1;
   }
 

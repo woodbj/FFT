@@ -384,3 +384,29 @@ void changeNPB()
         matrix.drawString(val, 0, BOTTOM_LINE);
     }
 }
+
+void changeOSR()
+{
+    char title[6] = "osr";
+    char val[6];
+
+    if (gEncoderState.navigating)
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.setMenuColour(viewCol);
+        sprintf(val, "%.2f", processor.incrementOSR(0));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+    else
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(viewCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.setMenuColour(editCol);
+        sprintf(val, "%.2f", processor.incrementOSR(gEncoderState.delta));
+        setSampleRate(processor.getSampleRate());
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+}

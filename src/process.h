@@ -39,7 +39,7 @@ private:
     float nFirst = 30;
     float nLast;
     int notesPerBand = 3;
-    float osrMin = 1;
+    float osrMin = 4;
 
 public:
     Processor(Processor_Parameters_t p);
@@ -51,6 +51,7 @@ public:
     void setGain(int newgain) { gain = newgain;}
     int incrementLoThreshold(int);
     int incrementHiThreshold(int);
+    float incrementOSR(int);
     float incrementVolPeak(int);
     float getVolActual() { return volActual; }
     int incrementLoNote(int);

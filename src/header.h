@@ -10,7 +10,7 @@
 // initial conditions
 #define SAMPLES 1024
 #define SAMPLE_FREQ 10000 // 25140.0f
-#define FPS 35
+#define FPS 40
 
 // variables used across 
 int fpsRequested = FPS;
