@@ -16,7 +16,7 @@ void Compute(void *)
   for (;;)
   {
     capFPS(fpsRequested);
-    mic.getBuffer(samples);
+    
     fft.go(samples);
     xQueueSend(queue, &message, portMAX_DELAY);
   }
@@ -36,6 +36,7 @@ void ProcessTask(void *)
       matrix.go();
       gEncoderState = enc.getState();
       menu.navigate(gEncoderState);
+      mic.getBuffer(samples);
     }
   }
 }
@@ -46,14 +47,10 @@ void setup()
 
   menu.add(changeStyle);
   menu.add(changeStyleParameter);
-  menu.add(changeGain);
-  menu.add(changeSampleRate);
-  menu.add(changeLoVol);
   menu.add(changeHiVol);
-  menu.add(changeVolPeak);
-  menu.add(changeFPS);
-  menu.add(changeLoNote);
   menu.add(changeNPB);
+  menu.add(changeLoNote);
+  menu.add(changeFPS);
   
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));

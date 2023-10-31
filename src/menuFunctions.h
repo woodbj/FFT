@@ -1,5 +1,6 @@
 CRGB editCol = CRGB::Aqua;
 CRGB viewCol = CRGB::White;
+CRGB peekCol = CRGB::Orange;
 
 void changeStyle()
 {
@@ -7,6 +8,7 @@ void changeStyle()
     num += 1.1 * gEncoderState.delta;
     char title[6];
     char value[6];
+    int newmode;
 
     strcpy(title, "STYL");
 
@@ -24,10 +26,29 @@ void changeStyle()
         matrix.clearMenu();
         matrix.setMenuColour(viewCol);
         matrix.drawString(title, 0, TOP_LINE);
-        matrix.scrollMode(gEncoderState.delta);
+        newmode = matrix.scrollMode(gEncoderState.delta);
         matrix.setMenuColour(editCol);
         matrix.getModeString(value);
         matrix.drawString(value, 0, BOTTOM_LINE);
+
+        switch (newmode)
+        {
+        case SPECTROGRAM:
+            processor.setGain(1);
+            break;
+        case COLOUR_BC:
+            processor.setGain(2);
+            break;
+        case COLOUR_BCW:
+            processor.setGain(10);
+            break;
+        case RAINBOW_BC:
+            processor.setGain(2);
+            break;
+        case RAINBOW_BCW:
+            processor.setGain(10);
+            break;
+        }
     }
 }
 
@@ -116,7 +137,7 @@ void changeGain()
 {
     char title[6];
     char val[6];
-    strcpy(title, "GAIN");
+    strcpy(title, "RAMP");
 
     if (gEncoderState.navigating)
     {
@@ -155,8 +176,6 @@ double adjustSampleRate(int dir)
     processor.setSampleRate((int)sr);
     fft.setSampleRate((int)sr);
 
-    Serial.println(sr);
-
     return sr / 1000;
 }
 
@@ -172,10 +191,13 @@ void changeSampleRate()
     char val[6];
     strcpy(title, "SRAT");
 
+    if (!gEncoderState.navigating)
+        gEncoderState.navigating = true;
+
     matrix.clearMenu();
     matrix.setMenuColour(editCol);
     matrix.drawString(title, 0, TOP_LINE);
-    matrix.setMenuColour(viewCol);
+    matrix.setMenuColour(peekCol);
     float sr = (float)processor.getSampleRate() / 1000;
     sprintf(val, "%.1f", sr);
     matrix.drawString(val, 0, BOTTOM_LINE);
@@ -198,14 +220,14 @@ void changeFPS()
         sprintf(val1, "%d", fpsRequested);
         matrix.drawString(val1, 0, BOTTOM_LINE);
 
-        matrix.setMenuColour(CRGB::Orange);
+        matrix.setMenuColour(peekCol);
         sprintf(val2, "%d", fpsActual);
         matrix.drawString(val2, 9, BOTTOM_LINE);
     }
     else
     {
         fpsRequested += gEncoderState.delta;
-        fpsRequested = constrain(fpsRequested, 20, 35);
+        fpsRequested = constrain(fpsRequested, 20, 40);
 
         matrix.clearMenu();
         matrix.setMenuColour(viewCol);
@@ -304,34 +326,6 @@ void changeVolPeak()
         matrix.drawString(title2, 0, TOP_LINE + 5);
         matrix.setMenuColour(editCol);
         sprintf(val, "%.2f", processor.incrementVolPeak(gEncoderState.delta));
-        matrix.drawString(val, 0, BOTTOM_LINE);
-    }
-}
-
-void changeHiNote()
-{
-    char title[6] = "note";
-    char title2[6] = "hi";
-    char val[6];
-
-    if (gEncoderState.navigating)
-    {
-        matrix.clearMenu();
-        matrix.setMenuColour(editCol);
-        matrix.drawString(title, 0, TOP_LINE);
-        matrix.drawString(title2, 0, TOP_LINE + 5);
-        matrix.setMenuColour(viewCol);
-        sprintf(val, "%d", processor.incrementHiNote(0));
-        matrix.drawString(val, 0, BOTTOM_LINE);
-    }
-    else
-    {
-        matrix.clearMenu();
-        matrix.setMenuColour(viewCol);
-        matrix.drawString(title, 0, TOP_LINE);
-        matrix.drawString(title2, 0, TOP_LINE + 5);
-        matrix.setMenuColour(editCol);
-        sprintf(val, "%d", processor.incrementHiNote(gEncoderState.delta));
         matrix.drawString(val, 0, BOTTOM_LINE);
     }
 }

@@ -10,7 +10,11 @@
 // initial conditions
 #define SAMPLES 1024
 #define SAMPLE_FREQ 10000 // 25140.0f
-#define FPS 30
+#define FPS 35
+
+// variables used across 
+int fpsRequested = FPS;
+int sampleRateGlobal = SAMPLE_FREQ;
 
 
 // Microphone
@@ -22,7 +26,8 @@ Mic_Settings_t mic_settings = {
     .sck = I2S_SCK,
     .sd = I2S_SD,
     .sample_rate = SAMPLE_FREQ,
-    .sample_count = SAMPLES};
+    .sample_count = SAMPLES,
+    .gSampleRate = &sampleRateGlobal};
 
 Microphone mic = Microphone(mic_settings);
 
@@ -52,7 +57,8 @@ Processor_Parameters_t procparam = {
     .bandCount = BAND_COUNT,
     .bandValues = bandValues,
     .vRe = vRe,
-    .binsPerBand = binsPerBand};
+    .binsPerBand = binsPerBand,
+    .gSampleRate = &sampleRateGlobal};
 
 Processor processor = Processor(procparam);
 
@@ -60,8 +66,6 @@ Processor processor = Processor(procparam);
 #include "Matrix.h"
 #define FASTLED_INTERNAL
 #include <FastLED.h>
-
-int fpsRequested = FPS;
 
 Matrix_Parameters_t matparam = {
     .ledPin = LED_PIN,

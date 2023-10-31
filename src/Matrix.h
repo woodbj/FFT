@@ -61,7 +61,7 @@ public:
     int pindex(int, int);
     void buildSpectLayer();
     void HSLtoRGB(int, float, float);
-    void scrollMode(int dir);
+    int scrollMode(int dir);
     int getCurrentMode();
     int incrementColour(int);
     int incrementRainbowRate(int);

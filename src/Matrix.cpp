@@ -151,7 +151,7 @@ void Matrix::HSLtoRGB(int h, float s, float l)
   b = (int)((bTemp + m) * 255);
 }
 
-void Matrix::scrollMode(int dir)
+int Matrix::scrollMode(int dir)
 {
   int currentMode = mode;
   currentMode += dir;
@@ -160,6 +160,8 @@ void Matrix::scrollMode(int dir)
   else if (currentMode >= LAST_STYLE)
     currentMode = LAST_STYLE - 1;
   mode = currentMode;
+
+  return currentMode;
 }
 
 int Matrix::getCurrentMode()

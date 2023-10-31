@@ -25,6 +25,7 @@ typedef struct
     int sd;
     unsigned int sample_rate;
     int sample_count;
+    int *gSampleRate;
 
 } Mic_Settings_t;
 
