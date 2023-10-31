@@ -7,8 +7,11 @@
 #include "hardware.h"
 #include "utilities.h"
 
+// initial conditions
 #define SAMPLES 1024
-#define SAMPLE_FREQ 30000 // 25140.0f
+#define SAMPLE_FREQ 10000 // 25140.0f
+#define FPS 30
+
 
 // Microphone
 #include "microphone.h"
@@ -58,7 +61,7 @@ Processor processor = Processor(procparam);
 #define FASTLED_INTERNAL
 #include <FastLED.h>
 
-int fpsRequested = 25;
+int fpsRequested = FPS;
 
 Matrix_Parameters_t matparam = {
     .ledPin = LED_PIN,

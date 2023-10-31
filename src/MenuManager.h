@@ -3,7 +3,7 @@
 
 #include "Encoder.h"
 
-#define MENU_COUNT_MAX 10
+#define MENU_COUNT_MAX 20
 
 class MenuManager
 {

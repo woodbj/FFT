@@ -20,14 +20,13 @@ void Processor::scale()
   // Scale the bandValues
   float val;
   int counter = 0;
-  static float vol = volFloor;
   float volDelta = 0.01;
 
   for (int band = 0; band < parameters.bandCount; band++)
   {
     val = parameters.bandValues[band];
     val = powf(val, gain); // add non-linearity to the response
-    val *= vol;            // scale
+    val *= volActual;            // scale
     if (val > 1.0)
       val = 1.0; // set peak value at 1
     parameters.bandValues[band] = val;
@@ -37,13 +36,13 @@ void Processor::scale()
 
   if (counter > hiThreshold)
   {
-    vol -= (counter - hiThreshold) * volDelta;
+    volActual -= (counter - hiThreshold) * volDelta;
   }
   else if (counter < loThreshold)
   {
-    vol += (loThreshold - counter) * volDelta;
+    volActual += (loThreshold - counter) * volDelta;
   }
-  vol = constrain(vol, volFloor, volPeak);
+  volActual = constrain(volActual, volFloor, volPeak);
 }
 
 Processor::Processor(Processor_Parameters_t p)
@@ -120,7 +119,35 @@ float Processor::incrementVolPeak(int dir)
   volPeak += step * dir;
   if (volPeak < volFloor)
     volPeak = volFloor;
+  volActual = volPeak;
   return volPeak;
+}
+
+int Processor::incrementLoNote(int dir)
+{
+  int note = nFirst + dir;
+  note = constrain(note, 20, 50);
+  nFirst = note;
+  buildBins2();
+  return nFirst;
+}
+
+int Processor::incrementHiNote(int dir)
+{
+  int note = nLast + dir;
+  note = constrain(note, nFirst + parameters.bandCount, 100);
+  nLast = note;
+  buildBins();
+  return nLast;
+}
+
+int Processor::incrementNPB(int dir)
+{
+  int temp = notesPerBand + dir;
+  temp = constrain(temp, 1, 5);
+  notesPerBand = temp;
+  buildBins2();
+  return notesPerBand;
 }
 
 void Processor::buildBins()
@@ -129,8 +156,7 @@ void Processor::buildBins()
   float sampleRate = parameters.sampleRate;
   float res = sampleRate / (1.0f * parameters.sampleCount);
   int minBins = 1;
-  float nFirst = 32;
-  float nLast = 80;
+
 
   // find the starting conditions
   float fnFirst = C_0 * powf(2, nFirst / 12.0f); // determine the frequency of the first requested note
@@ -138,7 +164,7 @@ void Processor::buildBins()
   if (bnFirst < 1)
     bnFirst = 1;                     // if that bin is lower than bin 1, set to bin 1
   float fFirst = bnFirst * res;      // determine the frequency of that bin
-  nFirst = 12 * log2f(fFirst / C_0); // convert it to a note
+  // nFirst = 12 * log2f(fFirst / C_0); // convert it to a note
 
   // find the ending conditions
   float fnLast = C_0 * powf(2, nLast / 12.0f);
@@ -148,7 +174,7 @@ void Processor::buildBins()
     fLast = fsLast;
   int bLast = fLast / res + 1;
   fLast = bLast * res;
-  nLast = 12 * log2f(fLast / C_0);
+  // nLast = 12 * log2f(fLast / C_0);
   // find the notes per band
   float nPerBand = (nLast - nFirst) / parameters.bandCount;
   float nStart = nFirst;
@@ -183,6 +209,47 @@ void Processor::buildBins()
     bStart = bEnd + 1;
     nStart = nEnd;
   }
+}
+
+int Processor::buildBins2()
+{
+    int nMin = nFirst;
+    int nMax = notesPerBand * parameters.bandCount + nMin - 1;
+    float fMin = C0 * powf(2, (float)nMin / 12);
+    float fMax = C0 * powf(2, ((float)nMax + 0.5) / 12);
+    
+
+    float bwLo = C0 * (powf(2, (nMin + 0.5) / 12) - powf(2, (nMin - 0.5) / 12));
+    float bwHi = (2 * fMax * osrMin) / parameters.sampleCount;
+    float bw = bwLo;
+    if(bwHi > bwLo) bw = bwHi;
+
+    parameters.sampleRate = round(bw * parameters.sampleCount);
+
+    int n1 = nMin;
+    int n2;
+    float f1 = C0 * powf(2, (n1 - 0.5) / 12);
+    float f2;
+    int b1 = (int)(f1 / bw);
+    int b2;
+    int bc;
+
+    firstBin = b1;
+
+    for (int i = 0; i < parameters.bandCount; i++){
+        n2 = n1 + notesPerBand - 1;
+        f2 = C0 * powf(2, (n2 + 0.5) / 12);
+        b2 = f2 / bw;
+        bc = b2 - b1 + 1;
+
+        parameters.binsPerBand[i] = bc;
+
+        n1 = n2 + 1;
+        f1 = C0 * powf(2, (n1 - 0.5) / 12);
+        b1 = b2 + 1;
+    }
+
+    return parameters.sampleRate;
 }
 
 void Processor::go()

@@ -52,6 +52,8 @@ void setup()
   menu.add(changeHiVol);
   menu.add(changeVolPeak);
   menu.add(changeFPS);
+  menu.add(changeLoNote);
+  menu.add(changeNPB);
   
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));

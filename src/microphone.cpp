@@ -83,9 +83,9 @@ void Microphone::getBuffer(sampletype_t *input)
     delay(1);
 }
 
-unsigned int Microphone::getSampleRate()
+float Microphone::getSampleRate()
 {
-    return settings.sample_rate;
+    return i2s_get_clk(I2S_PORT);
 }
 
 void Microphone::setSampleRate(uint32_t rate)
