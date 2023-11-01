@@ -49,6 +49,7 @@ void ComputeFFT::getMagnitude()
 void ComputeFFT::setSampleRate(int newRate)
 {
     parameters.sampleRate = newRate;
+    Serial.printf("\nFFT sample rate %d", parameters.sampleRate);
 }
 
 void ComputeFFT::setWindow(enum Windows window)

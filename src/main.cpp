@@ -47,11 +47,11 @@ void setup()
 
   menu.add(changeStyle);
   menu.add(changeStyleParameter);
-  menu.add(changeHiVol);
-  menu.add(changeNPB);
-  menu.add(changeLoNote);
-  menu.add(changeOSR);
+  menu.add(changeVolTarget);
   menu.add(changeGain);
+  menu.add(changeFPS);
+  menu.add(changeFirstNote);
+  menu.add(changeNPB);
   
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));

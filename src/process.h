@@ -32,14 +32,13 @@ private:
     int lastBin;
     float gain = 1;
     int loThreshold = 1;
-    int hiThreshold = 6;
+    float hiThreshold = 0.5;
     float volFloor = 0.01;
     float volPeak = 1;
     float volActual = 0.1;
     float nFirst = 30;
     float nLast;
     int notesPerBand = 3;
-    float osrMin = 4;
 
 public:
     Processor(Processor_Parameters_t p);
@@ -47,16 +46,13 @@ public:
     void binsToBands();
     float freqToNote(float f) { return 12 * log2f(f / C0); }
     float noteToFreq(float n) { return C0 * powf(2, n / 12.0); }
-    double incrementGain(int);
+    float incrementGain(int);
     void setGain(int newgain) { gain = newgain;}
-    int incrementLoThreshold(int);
-    int incrementHiThreshold(int);
-    float incrementOSR(int);
-    float incrementVolPeak(int);
+    float incrementVolTarget(int);
     float getVolActual() { return volActual; }
     int incrementLoNote(int);
     int incrementNPB(int);
-    float getSampleRate() { return parameters.sampleRate;}
+    int getSampleRate() { return parameters.sampleRate;}
     int buildBins();
     void scale();
     void go();

@@ -93,4 +93,6 @@ void Microphone::setSampleRate(uint32_t rate)
     settings.sample_rate = rate;
     i2s_driver_uninstall(I2S_PORT);
     micInstall();
+    int sr = (int)i2s_get_clk(I2S_PORT);
+    Serial.printf("\ni2s clock %d", sr);
 }
