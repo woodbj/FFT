@@ -26,6 +26,8 @@ typedef struct
     unsigned int sample_rate;
     int sample_count;
     int *gSampleRate;
+    bool* resetSR;
+    int *newSR;
 
 } Mic_Settings_t;
 

@@ -23,6 +23,8 @@ typedef struct{
     double* imag;
     double* windowArray;
     enum Windows window;
+    bool *resetSR;
+    int *newSR;
 }ComputeFFT_Parameters_t;
 
 
@@ -34,13 +36,15 @@ class ComputeFFT{
 
     public:
     ComputeFFT(ComputeFFT_Parameters_t);
-    void go(short *);
+    
 
     void setWindow(enum Windows);
     void applyWindow();
     void prepareInput(short*);
     void getMagnitude();
     void setSampleRate(int);
+    int getSampleRate() { return parameters.sampleRate;}
+    void go(short *);
 
 };
 

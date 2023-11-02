@@ -14,7 +14,8 @@
 
 // variables used across 
 int fpsRequested = FPS;
-int sampleRateGlobal = SAMPLE_FREQ;
+int masterSamplingRate = SAMPLE_FREQ;
+bool masterSamplingReset = true;
 
 
 // Microphone
@@ -27,7 +28,9 @@ Mic_Settings_t mic_settings = {
     .sd = I2S_SD,
     .sample_rate = SAMPLE_FREQ,
     .sample_count = SAMPLES,
-    .gSampleRate = &sampleRateGlobal};
+    .gSampleRate = &masterSamplingRate,
+    .resetSR = &masterSamplingReset,
+    .newSR = &masterSamplingRate};
 
 Microphone mic = Microphone(mic_settings);
 
@@ -43,7 +46,9 @@ ComputeFFT_Parameters_t fftparam = {
     .real = vRe,
     .imag = vIm,
     .windowArray = win,
-    .window = HAMMING};
+    .window = HAMMING,
+    .resetSR = &masterSamplingReset,
+    .newSR = &masterSamplingRate};
 
 ComputeFFT fft = ComputeFFT(fftparam);
 
@@ -58,7 +63,8 @@ Processor_Parameters_t procparam = {
     .bandValues = bandValues,
     .vRe = vRe,
     .binsPerBand = binsPerBand,
-    .gSampleRate = &sampleRateGlobal};
+    .resetSR = &masterSamplingReset,
+    .newSR = &masterSamplingRate};
 
 Processor processor = Processor(procparam);
 

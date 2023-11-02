@@ -16,5 +16,6 @@
         "atomic": "cpp",
         "cstdint": "cpp",
         "*.tcc": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

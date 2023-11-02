@@ -3,53 +3,14 @@
 ComputeFFT::ComputeFFT(ComputeFFT_Parameters_t _parameters)
 {
     parameters = _parameters;
-    
+
     FFT = arduinoFFT(
         parameters.real,
         parameters.imag,
         parameters.sampleCount,
         parameters.sampleRate);
 
-    setWindow(parameters.window); 
-}
-
-void ComputeFFT::go(short *input)
-{
-    prepareInput(input);
-    applyWindow();
-    FFT.Compute(FFT_FORWARD);
-    getMagnitude();
-}
-
-void ComputeFFT::applyWindow()
-{
-    for (int i = 0; i < parameters.sampleCount; i++){
-        parameters.real[i] *= parameters.windowArray[i];
-    }
-}
-
-void ComputeFFT::prepareInput(short * input)
-{
-    for (int i = 0; i < parameters.sampleCount; i++){
-        parameters.real[i] = input[i];
-        parameters.imag[i] = 0;
-    }
-}
-
-void ComputeFFT::getMagnitude()
-{
-    double invsamples = 1.0f / parameters.sampleCount;
-    double pythag;
-    for (int i = 1; i < parameters.sampleCount / 2; i++){
-        pythag = parameters.real[i] * parameters.real[i] + parameters.imag[i] * parameters.imag[i];
-        parameters.real[i] = sqrt(pythag) * invsamples;
-    }
-}
-
-void ComputeFFT::setSampleRate(int newRate)
-{
-    parameters.sampleRate = newRate;
-    Serial.printf("\nFFT sample rate %d", parameters.sampleRate);
+    setWindow(parameters.window);
 }
 
 void ComputeFFT::setWindow(enum Windows window)
@@ -61,7 +22,7 @@ void ComputeFFT::setWindow(enum Windows window)
     {
         float z = TWOPI * i / (parameters.sampleCount * 1.0f);
         switch (window)
-        {  
+        {
         case HANNING:
             parameters.windowArray[i] = (1 - cos(z)) / 2.0f;
             break;
@@ -80,3 +41,57 @@ void ComputeFFT::setWindow(enum Windows window)
         }
     }
 }
+
+
+void ComputeFFT::applyWindow()
+{
+    for (int i = 0; i < parameters.sampleCount; i++)
+    {
+        parameters.real[i] *= parameters.windowArray[i];
+    }
+}
+
+void ComputeFFT::prepareInput(short *input)
+{
+    float sum = 0;
+    for (int i = 0; i < parameters.sampleCount; i++)
+    {
+        sum += input[i];
+        parameters.real[i] = input[i];
+        parameters.imag[i] = 0;
+    }
+    // Serial.println(sum);
+}
+
+void ComputeFFT::getMagnitude()
+{
+    double invsamples = 1.0f / parameters.sampleCount;
+    double pythag;
+    for (int i = 1; i < parameters.sampleCount / 2; i++)
+    {
+        pythag = parameters.real[i] * parameters.real[i] + parameters.imag[i] * parameters.imag[i];
+        parameters.real[i] = sqrt(pythag) * invsamples;
+    }
+}
+
+void ComputeFFT::setSampleRate(int newRate)
+{
+    parameters.sampleRate = newRate;
+
+    FFT = arduinoFFT(
+        parameters.real,
+        parameters.imag,
+        parameters.sampleCount,
+        parameters.sampleRate);
+}
+
+void ComputeFFT::go(short *input)
+{
+    prepareInput(input);
+    applyWindow();
+    FFT.Compute(FFT_FORWARD);
+    getMagnitude();
+}
+
+
+

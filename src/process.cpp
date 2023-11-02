@@ -6,11 +6,188 @@ float fmap(float x, float in_min, float in_max, float out_min, float out_max)
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+Processor::Processor(Processor_Parameters_t p)
+{
+  parameters = p;
+  buildBins();
+}
+
+void Processor::setSampleRate(int newSampleRate)
+{
+  parameters.sampleRate = newSampleRate;
+  if (!ignoreSRUpdate)
+  {
+    buildBins();
+  }
+  ignoreSRUpdate = false;
+}
+
+void Processor::binsToBands()
+{
+
+  int currentBand = 0;
+  float binNote;
+  float bw = parameters.sampleRate / parameters.sampleCount;
+  float n1 = nFirst - 0.5;
+  float n2 = n1 + notesPerBand;
+  parameters.bandValues[currentBand] = 0;
+  int binCount = 0;
+  float val;
+
+  stats.currentMax = 0;
+  stats.currentMin = __FLT_MAX__;
+  stats.currentAvg = 0;
+
+  for (int i = 2; i < parameters.sampleCount / 2 - 1; i++)
+  {
+    binNote = freqToNote(bw * i);
+
+    if (binNote >= n1 && binNote < n2)
+    {
+      val = parameters.vRe[i];
+      parameters.bandValues[currentBand] += val;
+      stats.currentAvg += val;
+      if (val > stats.currentMax)
+        stats.currentMax = val;
+      else if (val < stats.currentMin && val != 0)
+        stats.currentMin = val;
+
+      if (val > stats.allTimeMax && val < 500)
+        stats.allTimeMax = val;
+      else if (val < stats.allTimeMin && val != 0)
+        stats.allTimeMin = val;
+
+      binCount++;
+    }
+    else if (binNote > n2)
+    {
+
+      currentBand++;
+      if (currentBand >= parameters.bandCount)
+        break;
+
+      parameters.bandValues[currentBand] = 0;
+
+      n1 = n2;
+      n2 += notesPerBand;
+
+      i--;
+    }
+  }
+
+  float span = stats.currentMax - stats.currentMin;
+  stats.currentAvg = stats.currentAvg / binCount;
+}
+
+float Processor::incrementGain(int dir)
+{
+  double min = 1;
+  double max = 5;
+  double step = 0.5 * dir;
+
+  gain += step;
+  if (gain < min)
+    gain = min;
+  if (gain > max)
+    gain = max;
+
+  return gain;
+}
+
+float Processor::incrementVolTarget(int dir)
+{
+  hiThreshold += 0.05 * dir;
+  hiThreshold = constrain(hiThreshold, 0, 1);
+  return hiThreshold;
+}
+
+int Processor::incrementVolMode(int dir)
+{
+  volMode = constrain(volMode + dir, 0, LAST_VOL_MODE - 1);
+  return volMode;
+}
+
+float Processor::incrementVolume(int dir)
+{
+  volActual = volActual + 0.001 * dir;
+  if (volActual < 0)
+    volActual = 0;
+
+  return volActual;
+}
+
+int Processor::incrementLoNote(int dir)
+{
+  int old = nFirst;
+  int note = nFirst + constrain(dir, -1, 1);
+  note = constrain(note, 30, 50);
+  nFirst = note;
+  if (dir != 0)
+  {
+    if (buildBins() != 0)
+    {
+      nFirst = old;
+      buildBins();
+    }
+  }
+  return nFirst;
+}
+
+int Processor::incrementNPB(int dir)
+{
+  int old = notesPerBand;
+  int temp = notesPerBand + constrain(dir, -1, 1);
+  temp = constrain(temp, 1, 4);
+  notesPerBand = temp;
+  if (dir != 0)
+  {
+    if (buildBins() != 0)
+    {
+      notesPerBand = old;
+      buildBins();
+    }
+  }
+  return notesPerBand;
+}
+
+void Processor::resetStats()
+{
+  stats.allTimeMax = 0;
+  stats.allTimeMin = __FLT_MAX__;
+}
+
+int Processor::buildBins()
+{
+  float offset = 0.5;
+  int nMin = nFirst;
+  int nMax = notesPerBand * parameters.bandCount + nMin - 1;
+  float fMin = C0 * powf(2, (float)nMin / 12);
+  float fMax = C0 * powf(2, ((float)nMax + offset) / 12);
+
+  float bwLo = C0 * (powf(2, (nMin + 0.5) / 12) - powf(2, (nMin - 0.5) / 12));
+  float bwHi = (2 * fMax) / parameters.sampleCount;
+  float bw = bwLo;
+  if (bwHi > bwLo)
+  {
+    bw = bwHi;
+  }
+
+  parameters.sampleRate = round((float)(bw * parameters.sampleCount) / 100) * 100;
+
+  *parameters.newSR = parameters.sampleRate;
+  *parameters.resetSR = true;
+  ignoreSRUpdate = true;
+
+  resetStats();
+
+  return 0;
+}
+
 void Processor::scale()
 {
   float val;              // holds the band value while editing
   float volChange = 0.01; // how much to change the volume each iteration
-  float volMin = 0.1;     // hold the min value observed
+  float volMin = 0.01;    // hold the min value observed
   float average = 0;
   float min = 1e6;
   float max = 0;
@@ -48,7 +225,9 @@ void Processor::scale()
 
   // calculate the min-max span and add nonlinearity so "quiet" can be identified
   span = max - min;
-  span = powf(5, span);
+  span = powf(10, span);
+  if (span > 1000)
+    span = 1000;
 
   if (span > 3)
   { // if it's loud
@@ -60,187 +239,13 @@ void Processor::scale()
   }
 
   delta = target - average;
-  volActual += delta * volChange;
+  if (volMode == VolumeMode::AUTO)
+  {
+    volActual += delta * volChange;
+  }
 
   if (volActual < volMin)
     volActual = volMin;
-}
-
-Processor::Processor(Processor_Parameters_t p)
-{
-  parameters = p;
-  buildBins();
-}
-
-void Processor::setSampleRate(int newSampleRate)
-{
-  parameters.sampleRate = newSampleRate;
-  buildBins();
-}
-
-void Processor::binsToBands()
-{
-
-  float res = parameters.sampleRate / (1.0f * parameters.sampleCount);
-  float bandf;
-  int n1;
-  int n2;
-  float navg;
-
-  // fill bands and integral
-  int startBin = firstBin;
-  for (int band = 0; band < parameters.bandCount; band++)
-  {
-    parameters.bandValues[band] = 0;
-
-    // add each applicable bin to respective bands
-    float val;
-    int endBin = startBin + parameters.binsPerBand[band] - 1;
-    for (int bin = startBin; bin <= endBin; bin++)
-    {
-      val = parameters.vRe[bin];
-      // val = log10(val + 1);
-      parameters.bandValues[band] += val;
-    }
-    startBin = endBin + 1;
-
-    n1 = nFirst + band * notesPerBand;
-    n2 = n1 + notesPerBand - 1;
-    navg = ((float)n1 + (float)n2) / 2.0f;
-    bandf = noteToFreq(navg);
-    parameters.bandValues[band] = parameters.bandValues[band] / sqrt(bandf);
-  }
-}
-
-float Processor::incrementGain(int dir)
-{
-  double min = 1;
-  double max = 5;
-  double step = 0.5 * dir;
-
-  gain += step;
-  if (gain < min)
-    gain = min;
-  if (gain > max)
-    gain = max;
-
-  return gain;
-}
-
-float Processor::incrementVolTarget(int dir)
-{
-  hiThreshold += 0.05 * dir;
-  hiThreshold = constrain(hiThreshold, 0, 1);
-  return hiThreshold;
-}
-
-int Processor::incrementLoNote(int dir)
-{
-  int old = nFirst;
-  int note = nFirst + constrain(dir, -1, 1);
-  note = constrain(note, 30, 50);
-  nFirst = note;
-  if (dir != 0)
-  {
-    Serial.printf("\nIncrement n1 by %d", dir);
-    if (buildBins() != 0)
-    {
-      Serial.printf("\nIncrement fail");
-      nFirst = old;
-      buildBins();
-    }
-  }
-  return nFirst;
-}
-
-int Processor::incrementNPB(int dir)
-{
-  int old = notesPerBand;
-  int temp = notesPerBand + constrain(dir, -1, 1);
-  temp = constrain(temp, 1, 3);
-  notesPerBand = temp;
-  if (dir != 0)
-  {
-    Serial.printf("\nIncrement NPB by %d", dir);
-    if (buildBins() != 0)
-    {
-      Serial.printf("\nIncrement fail");
-      notesPerBand = old;
-      buildBins();
-    }
-  }
-  return notesPerBand;
-}
-
-int Processor::buildBins()
-{
-  Serial.printf("\nBuilding Bins");
-  float offset = 0.5;
-  int nMin = nFirst;
-  int nMax = notesPerBand * parameters.bandCount + nMin - 1;
-  float fMin = C0 * powf(2, (float)nMin / 12);
-  float fMax = C0 * powf(2, ((float)nMax + offset) / 12);
-
-  float bwLo = C0 * (powf(2, (nMin + 0.5) / 12) - powf(2, (nMin - 0.5) / 12));
-  float bwHi = (2 * fMax) / parameters.sampleCount;
-  float bw = bwLo;
-  if (bwHi > bwLo)
-  {
-    bw = bwHi;
-  }
-
-  Serial.printf("\n requested sr = %.0f", round(bw * parameters.sampleCount));
-
-  parameters.sampleRate = round((bw * parameters.sampleCount));
-  Serial.printf("\n new sample rate %d", parameters.sampleRate);
-
-  int n1 = nMin;
-  int n2;
-  float f1 = C0 * powf(2, (n1 - offset) / 12);
-  float f2;
-  int b1 = (int)(f1 / bw);
-  int b2;
-  int bc;
-  int bsum = 0;
-  bool redo = false;
-
-  firstBin = b1;
-
-  Serial.printf("\n first bin = %d", b1);
-
-  Serial.printf("\n bin:");
-
-  for (int i = 0; i < parameters.bandCount; i++)
-  {
-    n2 = n1 + notesPerBand - 1;
-    f2 = C0 * powf(2, (n2 + offset) / 12);
-    b2 = f2 / bw;
-    bc = b2 - b1 + 1;
-    bsum += bc;
-
-    Serial.printf("\nbins %d - %d, count %d", b1, b2, bc);
-
-    if (bc == 0)
-    {
-      Serial.printf("\n redoing, bin count = 0");
-    }
-
-    parameters.binsPerBand[i] = bc;
-    n1 = n2 + 1;
-    f1 = C0 * powf(2, (n1 - offset) / 12);
-    b1 = b2 + 1;
-  }
-
-  lastBin = bsum + firstBin - 1;
-
-  Serial.printf("\n last bin = %d", lastBin);
-
-  if (redo)
-  {
-    return -1;
-  }
-
-  return 0;
 }
 
 void Processor::go()

@@ -10,14 +10,27 @@ void dialISR()
   enc.setDial();
 }
 
+void resetSR()
+{
+  if (masterSamplingReset)
+  {
+    processor.setSampleRate(masterSamplingRate);
+    mic.setSampleRate((uint32_t)masterSamplingRate);
+    fft.setSampleRate(masterSamplingRate);
+    masterSamplingReset = false;
+    Serial.printf("\nresetting sr to %d", masterSamplingRate);
+  }
+}
+
 void Compute(void *)
 {
   Queue_Message_t message = READY_TO_PROCESS;
   for (;;)
   {
     capFPS(fpsRequested);
-    
+
     fft.go(samples);
+    delay(1);
     xQueueSend(queue, &message, portMAX_DELAY);
   }
 }
@@ -32,6 +45,7 @@ void ProcessTask(void *)
   {
     if (xQueueReceive(queue, &message, portMAX_DELAY) == pdTRUE && message == READY_TO_PROCESS)
     {
+      resetSR();
       processor.go();
       matrix.go();
       gEncoderState = enc.getState();
@@ -47,12 +61,12 @@ void setup()
 
   menu.add(changeStyle);
   menu.add(changeStyleParameter);
-  menu.add(changeVolTarget);
+  menu.add(changeVolMode);
+  menu.add(changeVolParameter);
   menu.add(changeGain);
   menu.add(changeFPS);
   menu.add(changeFirstNote);
   menu.add(changeNPB);
-  
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));
 

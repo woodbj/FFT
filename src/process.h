@@ -7,10 +7,10 @@
 
 #define C0 16.3515978312874f
 
-enum ScaleMode {
-    DB_POWER_DENSITY,
-    INT_POWER_DENSITY,
-    LAST_SCALE_MODE
+enum VolumeMode {
+    STATIC,
+    AUTO,
+    LAST_VOL_MODE
 };
 
 typedef struct
@@ -22,12 +22,24 @@ typedef struct
     double *vRe;
     int *binsPerBand;
     int *gSampleRate;
+    bool*resetSR;
+    int*newSR;
 } Processor_Parameters_t;
+
+typedef struct
+{
+    float currentMin;
+    float currentMax;
+    float currentAvg;
+    float allTimeMin = __FLT_MAX__;
+    float allTimeMax = 0;
+} FFT_Stats_t;
 
 class Processor
 {
 private:
     Processor_Parameters_t parameters;
+    FFT_Stats_t stats;
     int firstBin;
     int lastBin;
     float gain = 1;
@@ -39,6 +51,9 @@ private:
     float nFirst = 30;
     float nLast;
     int notesPerBand = 3;
+    int volMode = STATIC;
+    bool ignoreSRUpdate = false;
+;
 
 public:
     Processor(Processor_Parameters_t p);
@@ -50,9 +65,12 @@ public:
     void setGain(int newgain) { gain = newgain;}
     float incrementVolTarget(int);
     float getVolActual() { return volActual; }
+    int incrementVolMode(int);
+    float incrementVolume(int);
     int incrementLoNote(int);
     int incrementNPB(int);
     int getSampleRate() { return parameters.sampleRate;}
+    void resetStats();
     int buildBins();
     void scale();
     void go();

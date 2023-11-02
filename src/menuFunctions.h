@@ -4,17 +4,6 @@ CRGB peekCol = CRGB::Orange;
 
 // sub functions
 
-void setSampleRate()
-{
-    Serial.printf("\n applying new sr to mic and fft");
-
-    int sr = processor.getSampleRate();
-
-    mic.setSampleRate((uint32_t)sr);
-    fft.setSampleRate((int)sr);
-
-}
-
 void colourMode()
 {
     char title[6];
@@ -69,6 +58,52 @@ void rainbowMode()
     }
 }
 
+void setVolTarget()
+{
+
+    char title[6] = "vtgt";
+    char val[6];
+
+    if (gEncoderState.navigating)
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.setMenuColour(viewCol);
+        sprintf(val, "%.2f", processor.incrementVolTarget(0));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+    else
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        sprintf(val, "%.2f", processor.incrementVolTarget(gEncoderState.delta));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+}
+
+void setVolStatic()
+{
+    char title[6] = "vset";
+    char val[6];
+
+    if (gEncoderState.navigating)
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.setMenuColour(viewCol);
+        sprintf(val, "%.2f", processor.incrementVolume(0));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+    else
+    {
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        sprintf(val, "%.2f", processor.incrementVolume(gEncoderState.delta)*10);
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+}
 // menu functions
 
 void changeStyle()
@@ -150,30 +185,62 @@ void changeStyleParameter()
     }
 }
 
-void changeVolTarget()
+void changeVolMode()
 {
-
-    char title[6] = "vol";
-    char title2[6] = "hi";
+    char title[6];
+    char title2[6];
     char val[6];
+    strcpy(title, "Vol");
+    strcpy(title2, "mode");
 
     if (gEncoderState.navigating)
     {
         matrix.clearMenu();
         matrix.setMenuColour(editCol);
         matrix.drawString(title, 0, TOP_LINE);
+        matrix.drawString(title2, 0, TOP_LINE + 5);
         matrix.setMenuColour(viewCol);
-        sprintf(val, "%.2f", processor.incrementVolTarget(0));
+        switch (processor.incrementVolMode(0))
+        {
+        case VolumeMode::AUTO:
+            strcpy(val, "AUTO");
+            break;
+
+        case VolumeMode::STATIC:
+            strcpy(val, "STAT");
+            break;
+        }
         matrix.drawString(val, 0, BOTTOM_LINE);
     }
     else
     {
         matrix.clearMenu();
-        // matrix.setMenuColour(viewCol);
-        // matrix.drawString(title, 0, TOP_LINE);
         matrix.setMenuColour(editCol);
-        sprintf(val, "%.2f", processor.incrementVolTarget(gEncoderState.delta));
+        switch (processor.incrementVolMode(gEncoderState.delta))
+        {
+        case VolumeMode::AUTO:
+            strcpy(val, "AUTO");
+            break;
+
+        case VolumeMode::STATIC:
+            strcpy(val, "STAT");
+            break;
+        }
         matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+}
+
+void changeVolParameter()
+{
+    switch (processor.incrementVolMode(0))
+    {
+    case VolumeMode::STATIC:
+        setVolStatic();
+        break;
+
+    case VolumeMode::AUTO:
+        setVolTarget();
+        break;
     }
 }
 
@@ -229,7 +296,6 @@ void changeFirstNote()
         // matrix.setMenuColour(editCol);
         // processor.incrementLoNote(gEncoderState.delta);
         sprintf(val, "%d", processor.incrementLoNote(gEncoderState.delta));
-        setSampleRate();
         matrix.drawString(val, 0, BOTTOM_LINE);
     }
 }
@@ -256,7 +322,6 @@ void changeNPB()
         // matrix.setMenuColour(editCol);
         // processor.incrementNPB(gEncoderState.delta);
         sprintf(val, "%d", processor.incrementNPB(gEncoderState.delta));
-        setSampleRate();
         matrix.drawString(val, 0, BOTTOM_LINE);
     }
 }
@@ -284,7 +349,7 @@ void changeFPS()
         fpsRequested = constrain(fpsRequested, 20, 44);
 
         matrix.clearMenu();
-        
+
         matrix.setMenuColour(editCol);
         sprintf(val1, "%d", fpsRequested);
         matrix.drawString(val1, 0, BOTTOM_LINE);
