@@ -51,6 +51,7 @@ private:
     unsigned long lastMenuDrawTime = millis() - menuDwell_ms;
     int rainbowRate = 5;
     int colourMode = 0;
+    float dim = 1;
 
     float h, s, l;
     int r, g, b;
@@ -65,10 +66,12 @@ public:
     int getCurrentMode();
     int incrementColour(int);
     int incrementRainbowRate(int);
+    void setBrt(float dimval) {dim = dimval;}
     void getModeString(char*);
     void setMenuColour(CRGB);
     void clearMenu();
     void drawString(char*, int, int);
+    void drawBox(int, int, int, int);
     void mergeLayers();
     void go();
 };

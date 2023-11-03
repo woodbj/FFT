@@ -60,7 +60,6 @@ void ComputeFFT::prepareInput(short *input)
         parameters.real[i] = input[i];
         parameters.imag[i] = 0;
     }
-    // Serial.println(sum);
 }
 
 void ComputeFFT::getMagnitude()

@@ -53,6 +53,9 @@ private:
     int notesPerBand = 3;
     int volMode = STATIC;
     bool ignoreSRUpdate = false;
+
+    float dbfsFloor = -110;
+    float dbfsCeiling = -50;
 ;
 
 public:
@@ -65,6 +68,8 @@ public:
     void setGain(int newgain) { gain = newgain;}
     float incrementVolTarget(int);
     float getVolActual() { return volActual; }
+    float incrementDBFSFloor(int);
+    float incrementDBFSCeiling(int);
     int incrementVolMode(int);
     float incrementVolume(int);
     int incrementLoNote(int);
@@ -72,6 +77,7 @@ public:
     int getSampleRate() { return parameters.sampleRate;}
     void resetStats();
     int buildBins();
+    void rawToDPFS();
     void scale();
     void go();
 };

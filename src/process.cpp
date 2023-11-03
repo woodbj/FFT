@@ -101,6 +101,22 @@ float Processor::incrementVolTarget(int dir)
   return hiThreshold;
 }
 
+float Processor::incrementDBFSFloor(int dir)
+{
+  float val = dbfsFloor - dir;
+  if (val < dbfsCeiling)
+    dbfsFloor = val;
+  return dbfsFloor;
+}
+
+float Processor::incrementDBFSCeiling(int dir)
+{
+  float val = dbfsCeiling - dir;
+  if (val > dbfsFloor)
+    dbfsCeiling = val;
+  return dbfsCeiling;
+}
+
 int Processor::incrementVolMode(int dir)
 {
   volMode = constrain(volMode + dir, 0, LAST_VOL_MODE - 1);
@@ -183,6 +199,47 @@ int Processor::buildBins()
   return 0;
 }
 
+void Processor::rawToDPFS()
+{
+  float val;
+  float ref = pow(2, 15);
+  float nlo;
+  float nhi;
+  float bandf;
+  static float sumlast = 0;
+  float weight = 0.001;
+  float sum = 8;
+  bool fscale = true;
+
+  Serial.printf("\n");
+  for (int i = 0; i < parameters.bandCount; i++)
+  {
+    val = parameters.bandValues[i];
+    nlo = nFirst + i * notesPerBand - 0.5;
+    nhi = nlo + notesPerBand;
+
+    if (fscale)
+    {
+      bandf = noteToFreq((nlo + nhi) / 2);
+      val /= sqrt(bandf);
+    }
+
+
+    val = 20 * log10(val / ref);
+
+    val = fmap(val, dbfsFloor, dbfsCeiling, 0, 1);
+    val = constrain(val, 0, 1);
+
+    sum += val;
+
+    val = powf(val, gain);
+    parameters.bandValues[i] = val;
+  }
+  sum = sum * weight + sumlast * (1 - weight);
+  sumlast = sum;
+  Serial.printf("\t%f", sum);
+}
+
 void Processor::scale()
 {
   float val;              // holds the band value while editing
@@ -251,5 +308,6 @@ void Processor::scale()
 void Processor::go()
 {
   binsToBands();
-  scale();
+  rawToDPFS();
+  // scale();
 }

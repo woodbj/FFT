@@ -18,7 +18,6 @@ void resetSR()
     mic.setSampleRate((uint32_t)masterSamplingRate);
     fft.setSampleRate(masterSamplingRate);
     masterSamplingReset = false;
-    Serial.printf("\nresetting sr to %d", masterSamplingRate);
   }
 }
 
@@ -61,12 +60,9 @@ void setup()
 
   menu.add(changeStyle);
   menu.add(changeStyleParameter);
-  menu.add(changeVolMode);
-  menu.add(changeVolParameter);
+  menu.add(changeFloor);
+  menu.add(changeCeiling);
   menu.add(changeGain);
-  menu.add(changeFPS);
-  menu.add(changeFirstNote);
-  menu.add(changeNPB);
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));
 

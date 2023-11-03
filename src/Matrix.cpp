@@ -299,6 +299,18 @@ void Matrix::drawString(char *string, int xpos, int ypos)
   lastMenuDrawTime = millis();
 }
 
+void Matrix::drawBox(int x1, int y1, int x2, int y2)
+{
+  for (int x = x1; x <= x2; x++)
+  {
+    for (int y = y1; y <= y2; y++)
+    {
+      menu[pindex(x, y)] = menuColour;
+    }
+
+  }
+}
+
 void Matrix::mergeLayers()
 {
   for (int i = 0; i < NUM_LED; i++)
@@ -312,7 +324,6 @@ void Matrix::mergeLayers()
       }
       else
       {
-        float dim = 0.25;
         int r = dim * leds[i].red;
         int g = dim * leds[i].green;
         int b = dim * leds[i].blue;

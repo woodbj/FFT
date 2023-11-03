@@ -10,13 +10,15 @@ This header includes everything needed to install and run an i2s microphone
 #include <Arduino.h>
 #endif
 
-#define SAMPLES_PER_DMA_BUFFER 64
+#define SAMPLES_PER_DMA_BUFFER 128
 #define BITS_PER_SAMPLE I2S_BITS_PER_SAMPLE_16BIT
 #define BYTES_PER_SAMPLE (BITS_PER_SAMPLE / 8)
 #define BYTES_PER_DMA_BUFFER (SAMPLES_PER_DMA_BUFFER * BYTES_PER_SAMPLE)
 #define I2S_PORT I2S_NUM_0
 
 typedef short sampletype_t;
+
+
 
 typedef struct
 {
@@ -36,6 +38,9 @@ class Microphone
 private:
     Mic_Settings_t settings;
     int dma_buffer_count;
+    TickType_t wait = portMAX_DELAY;
+
+    sampletype_t i2sread[1024];
 
 public:
     Microphone(Mic_Settings_t);

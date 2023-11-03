@@ -22,6 +22,7 @@ bool masterSamplingReset = true;
 #include "microphone.h"
 sampletype_t samples[SAMPLES];
 
+
 Mic_Settings_t mic_settings = {
     .ws = I2S_WS,
     .sck = I2S_SCK,
