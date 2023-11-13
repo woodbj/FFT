@@ -5,6 +5,7 @@
 #include <Arduino.h>
 
 #define TWOPI 6.28318530718
+#define C0 16.3515978312874f
 
 
 enum Windows {
@@ -36,7 +37,6 @@ class ComputeFFT{
 
     public:
     ComputeFFT(ComputeFFT_Parameters_t);
-    
 
     void setWindow(enum Windows);
     void applyWindow();

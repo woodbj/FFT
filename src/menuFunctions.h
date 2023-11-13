@@ -369,37 +369,11 @@ void changeFPS()
     }
 }
 
-void changeFloor()
+void changeDBFSCeiling()
 {
     char title[6];
     char val[6];
-    strcpy(title, "FLR");
-
-    if (gEncoderState.navigating)
-    {
-        matrix.setBrt(0.25);
-        matrix.clearMenu();
-        matrix.setMenuColour(editCol);
-        matrix.drawString(title, 0, TOP_LINE);
-        matrix.setMenuColour(viewCol);
-        sprintf(val, "%.0f", processor.incrementDBFSFloor(0));
-        matrix.drawString(val, 0, BOTTOM_LINE);
-    }
-    else
-    {
-        matrix.clearMenu();
-        matrix.setBrt(1);
-        matrix.setMenuColour(editCol);
-        sprintf(val, "%.f", processor.incrementDBFSFloor(gEncoderState.delta));
-        matrix.drawString(val, 0, BOTTOM_LINE);
-    }
-}
-
-void changeCeiling()
-{
-    char title[6];
-    char val[6];
-    strcpy(title, "ceil");
+    strcpy(title, "LOUD");
 
     if (gEncoderState.navigating)
     {
@@ -413,10 +387,36 @@ void changeCeiling()
     }
     else
     {
+        matrix.clearMenu();
+        matrix.setBrt(1);
+        matrix.setMenuColour(editCol);
+        sprintf(val, "%.f", processor.incrementDBFSCeiling(gEncoderState.delta));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+}
+
+void changeDBFSBand()
+{
+    char title[6];
+    char val[6];
+    strcpy(title, "FUZZ");
+
+    if (gEncoderState.navigating)
+    {
+        matrix.setBrt(0.25);
+        matrix.clearMenu();
+        matrix.setMenuColour(editCol);
+        matrix.drawString(title, 0, TOP_LINE);
+        matrix.setMenuColour(viewCol);
+        sprintf(val, "%.0f", processor.incrementDBFSBand(0));
+        matrix.drawString(val, 0, BOTTOM_LINE);
+    }
+    else
+    {
         matrix.setBrt(1);
         matrix.clearMenu();
         matrix.setMenuColour(editCol);
-        sprintf(val, "%.f", processor.incrementDBFSCeiling(gEncoderState.delta));
+        sprintf(val, "%.f", processor.incrementDBFSBand(gEncoderState.delta));
         matrix.drawString(val, 0, BOTTOM_LINE);
     }
 }

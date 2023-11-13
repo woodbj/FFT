@@ -18,6 +18,7 @@ int masterSamplingRate = SAMPLE_FREQ;
 bool masterSamplingReset = true;
 
 
+
 // Microphone
 #include "microphone.h"
 sampletype_t samples[SAMPLES];
@@ -54,9 +55,11 @@ ComputeFFT_Parameters_t fftparam = {
 ComputeFFT fft = ComputeFFT(fftparam);
 
 // Processor
+
 #include "process.h"
 float bandValues[BAND_COUNT];
 int binsPerBand[BAND_COUNT];
+
 Processor_Parameters_t procparam = {
     .sampleRate = SAMPLE_FREQ,
     .sampleCount = SAMPLES,
@@ -68,6 +71,7 @@ Processor_Parameters_t procparam = {
     .newSR = &masterSamplingRate};
 
 Processor processor = Processor(procparam);
+
 
 // Matrix
 #include "Matrix.h"

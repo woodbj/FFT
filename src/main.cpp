@@ -60,9 +60,8 @@ void setup()
 
   menu.add(changeStyle);
   menu.add(changeStyleParameter);
-  menu.add(changeFloor);
-  menu.add(changeCeiling);
-  menu.add(changeGain);
+  menu.add(changeDBFSCeiling);
+  menu.add(changeDBFSBand);
 
   queue = xQueueCreate(1, sizeof(Queue_Message_t));
 

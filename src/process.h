@@ -7,6 +7,8 @@
 
 #define C0 16.3515978312874f
 
+
+
 enum VolumeMode {
     STATIC,
     AUTO,
@@ -54,9 +56,28 @@ private:
     int volMode = STATIC;
     bool ignoreSRUpdate = false;
 
-    float dbfsFloor = -110;
     float dbfsCeiling = -50;
-;
+    float dbfsBand = 20;
+    float dbfsFloor;
+
+    float floorAdjust[16] = {
+        0.191418455882413, 	
+        1.22203022058825, 	
+        2.18962669117656, 	
+        -1.36495919117645, 	
+        2.09865022058825, 	
+        0.851461985294165, 	
+        -1.79095448529411, 	
+        -8.556300367647, 	
+        -5.12030742647056, 	
+        -5.02930860294113, 	
+        0.856685514705944, 	
+        1.07220316176472, 	
+        1.85929727941175, 	
+        2.56212080882358, 	
+        3.86794433823532, 	
+        5.09039139705885};
+
 
 public:
     Processor(Processor_Parameters_t p);
@@ -70,6 +91,7 @@ public:
     float getVolActual() { return volActual; }
     float incrementDBFSFloor(int);
     float incrementDBFSCeiling(int);
+    float incrementDBFSBand(int);
     int incrementVolMode(int);
     float incrementVolume(int);
     int incrementLoNote(int);

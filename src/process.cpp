@@ -9,6 +9,7 @@ float fmap(float x, float in_min, float in_max, float out_min, float out_max)
 Processor::Processor(Processor_Parameters_t p)
 {
   parameters = p;
+  dbfsFloor = dbfsCeiling - dbfsBand;
   buildBins();
 }
 
@@ -111,10 +112,18 @@ float Processor::incrementDBFSFloor(int dir)
 
 float Processor::incrementDBFSCeiling(int dir)
 {
-  float val = dbfsCeiling - dir;
-  if (val > dbfsFloor)
-    dbfsCeiling = val;
+  dbfsCeiling -= dir;
+  dbfsFloor = dbfsCeiling - dbfsBand;
   return dbfsCeiling;
+}
+
+float Processor::incrementDBFSBand(int dir)
+{
+  float val = dbfsBand + dir;
+  if(val < 1) val = 1;
+  dbfsBand = val;
+  dbfsFloor = dbfsCeiling - dbfsBand;
+  return dbfsBand;
 }
 
 int Processor::incrementVolMode(int dir)
@@ -210,8 +219,8 @@ void Processor::rawToDPFS()
   float weight = 0.001;
   float sum = 8;
   bool fscale = true;
-
   Serial.printf("\n");
+
   for (int i = 0; i < parameters.bandCount; i++)
   {
     val = parameters.bandValues[i];
@@ -226,6 +235,8 @@ void Processor::rawToDPFS()
 
 
     val = 20 * log10(val / ref);
+    val += floorAdjust[i];
+    Serial.printf("\t%f", val);
 
     val = fmap(val, dbfsFloor, dbfsCeiling, 0, 1);
     val = constrain(val, 0, 1);
@@ -237,7 +248,6 @@ void Processor::rawToDPFS()
   }
   sum = sum * weight + sumlast * (1 - weight);
   sumlast = sum;
-  Serial.printf("\t%f", sum);
 }
 
 void Processor::scale()

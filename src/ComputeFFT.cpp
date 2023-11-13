@@ -42,7 +42,6 @@ void ComputeFFT::setWindow(enum Windows window)
     }
 }
 
-
 void ComputeFFT::applyWindow()
 {
     for (int i = 0; i < parameters.sampleCount; i++)
@@ -53,10 +52,8 @@ void ComputeFFT::applyWindow()
 
 void ComputeFFT::prepareInput(short *input)
 {
-    float sum = 0;
     for (int i = 0; i < parameters.sampleCount; i++)
     {
-        sum += input[i];
         parameters.real[i] = input[i];
         parameters.imag[i] = 0;
     }
@@ -91,6 +88,3 @@ void ComputeFFT::go(short *input)
     FFT.Compute(FFT_FORWARD);
     getMagnitude();
 }
-
-
-
